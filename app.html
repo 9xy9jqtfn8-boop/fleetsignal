@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0072ff">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FleetSignal</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+  <div class="header">🚗 FleetSignal</div>
+
+  <!-- LOGIN -->
+  <div id="authBox" class="container">
+    <div class="card">
+      <h2>Login</h2>
+
+      <input id="email" type="email" placeholder="Email" />
+      <input id="password" type="password" placeholder="Password" />
+
+      <button id="loginBtn" class="primary-btn">Login</button>
+      <button id="signupBtn" class="logout-btn">Sign Up</button>
+      <button id="resetBtn" class="logout-btn">Forgot Password?</button>
+
+      <p id="authMessage"></p>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboardBox" class="container hidden">
+    <div class="card">
+      <h2>🚗 Fleet Dashboard</h2>
+
+      <input id="regInput" placeholder="Enter registration (AB12CDE)" />
+      <input id="vehicleName" placeholder="Vehicle name (optional)" />
+      <input id="vehicleType" placeholder="Type (Car / Van / etc)" />
+      <input id="vehicleColour" placeholder="Colour" />
+
+      <button onclick="checkVehicle()" class="primary-btn">
+        Check Vehicle
+      </button>
+
+      <div id="result"></div>
+
+      <div style="margin-top: 15px;">
+        <strong>Your Vehicles:</strong>
+        <div id="vehicleList"></div>
+      </div>
+
+      <button onclick="logout()" class="logout-btn">Logout</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

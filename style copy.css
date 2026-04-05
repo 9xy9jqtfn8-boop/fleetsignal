@@ -1,0 +1,316 @@
+/* =========================
+ GLOBAL (CRITICAL FIX)
+========================= */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: radial-gradient(circle at top, #1e3c72, #0b1a2a);
+  color: white;
+}
+
+/* =========================
+ HEADER
+========================= */
+.header {
+  text-align: center;
+  padding: 16px;
+  font-size: 20px;
+  font-weight: bold;
+  background: linear-gradient(to right, #1e90ff, #00c6ff);
+}
+
+/* =========================
+ MAIN CONTAINER (FIXED)
+========================= */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 15px;
+}
+
+/* =========================
+ CARD (CENTER FIX)
+========================= */
+.card {
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+/* =========================
+ INPUT + BUTTON (FIXED)
+========================= */
+input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  margin-bottom: 12px;
+  font-size: 16px;
+  display: block;
+
+  transition: 0.2s;
+}
+
+/* 🔥 PREMIUM FOCUS GLOW */
+input:focus {
+  outline: none;
+  box-shadow: 0 0 12px rgba(0, 200, 255, 0.5);
+}
+
+/* BUTTONS */
+button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* MAIN BUTTON */
+.primary-btn {
+  background: linear-gradient(to right, #00c6ff, #0072ff);
+  color: white;
+  box-shadow: 0 0 15px rgba(0,200,255,0.6);
+}
+
+/* Hover polish */
+.primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 20px rgba(0,200,255,0.8);
+}
+
+/* LOGOUT BUTTON */
+.logout-btn {
+  background: #777;
+  margin-top: 10px;
+}
+
+/* =========================
+ RESULT BOX
+========================= */
+#result {
+  margin-top: 15px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.5);
+  text-align: center;
+}
+
+/* =========================
+ VEHICLE LIST
+========================= */
+#vehicleList {
+  margin-top: 15px;
+}
+
+/* =========================
+ VEHICLE CARD (PREMIUM UPGRADE)
+========================= */
+.vehicle-card {
+  position: relative;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 14px;
+
+  backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(255,255,255,0.05);
+
+  transition: all 0.2s ease;
+}
+
+/* 🔥 PREMIUM HOVER */
+.vehicle-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.5),
+    0 0 15px rgba(0,200,255,0.15);
+}
+
+/* Title */
+.vehicle-title {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+/* Stats layout */
+.vehicle-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* =========================
+ BADGES (UPGRADED)
+========================= */
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  margin: 3px;
+
+  backdrop-filter: blur(6px);
+}
+
+/* COLORS */
+.green {
+  background: rgba(0,255,120,0.15);
+  color: #00ff88;
+  box-shadow: 0 0 10px rgba(0,255,120,0.3);
+}
+
+.red {
+  background: rgba(255,0,0,0.15);
+  color: #ff4d4d;
+  box-shadow: 0 0 10px rgba(255,0,0,0.3);
+}
+
+.yellow {
+  background: rgba(255,200,0,0.15);
+  color: #ffd000;
+  box-shadow: 0 0 10px rgba(255,200,0,0.3);
+}
+
+.grey {
+  background: rgba(200,200,200,0.15);
+  color: #ccc;
+}
+
+/* =========================
+ DELETE BUTTON
+========================= */
+.delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #ff4d4d;
+  font-size: 18px;
+  cursor: pointer;
+  width: auto;
+  transition: 0.2s;
+}
+
+.delete-btn:hover {
+  transform: scale(1.25);
+  color: #ff0000;
+}
+
+/* =========================
+ SECTION TITLE
+========================= */
+h3, .section-title {
+  margin-top: 18px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* =========================
+ VISIBILITY FIX (CRITICAL)
+========================= */
+.hidden {
+  display: none !important;
+}
+
+/* =========================
+ SMALL SCREEN POLISH
+========================= */
+@media (max-width: 400px) {
+  .card {
+    padding: 18px;
+  }
+
+  input {
+    font-size: 14px;
+  }
+
+  button {
+    font-size: 14px;
+  }
+}
+
+/* =========================
+ ANIMATIONS + POLISH
+========================= */
+
+.fade-in {
+  animation: fadeInUp 0.25s ease;
+}
+
+.list-loading {
+  opacity: 0.75;
+  padding: 8px 0;
+}
+
+/* Smooth card entrance */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+/* =========================
+  LIGHT MODE UPGRADE
+========================= */
+
+body {
+  background: linear-gradient(to bottom, #f5f7fb, #e9eef5);
+  color: #111;
+}
+
+/* Card becomes softer */
+.card {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+}
+
+/* Inputs cleaner */
+input {
+  background: white;
+  border: 1px solid rgba(0,0,0,0.08);
+  color: #111;
+}
+
+/* Result box */
+#result {
+  background: rgba(0,0,0,0.05);
+  color: #111;
+}
+
+/* Vehicle cards (premium light style) */
+.vehicle-card {
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* Subtle glow polish */
+.vehicle-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+ }
+
+}
