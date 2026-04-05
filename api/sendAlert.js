@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     const { email, reg, days } = req.body;
 
     const response = await resend.emails.send({
-      from: "FleetSignal <onboarding@resend.dev>",
+      from: "FleetSignal <alerts@getfleetsignal.com>",
       to: email,
       subject: `MOT Alert for ${reg}`,
       html: `<p>Your vehicle <strong>${reg}</strong> has ${days} days left on MOT.</p>`
