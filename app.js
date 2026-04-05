@@ -196,7 +196,7 @@ try {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        email: "lonewolf42@mail.com",
+        email: "wsfireservices@gmail.com",
         reg: reg,
         days: motDays
       })
