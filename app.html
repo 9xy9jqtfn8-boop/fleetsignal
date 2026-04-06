@@ -1,21 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0072ff">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FleetSignal</title>
-
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
-
 <body>
-
   <div class="header">🚗 FleetSignal</div>
 
   <!-- LOGIN -->
@@ -27,35 +19,31 @@
       <input id="password" type="password" placeholder="Password" />
 
       <button id="loginBtn" class="primary-btn">Login</button>
-      <button id="signupBtn" class="logout-btn">Sign Up</button>
-      <button id="resetBtn" class="logout-btn">Forgot Password?</button>
+      <button id="signupBtn" class="secondary-btn">Sign Up</button>
 
-      <p id="authMessage"></p>
+      <p id="authMessage" class="message"></p>
     </div>
   </div>
 
   <!-- DASHBOARD -->
   <div id="dashboardBox" class="container hidden">
     <div class="card">
-      <h2>🚗 Fleet Dashboard</h2>
+      <h1>🚗 Fleet Dashboard</h1>
 
-      <input id="regInput" placeholder="Enter registration (AB12CDE)" />
-      <input id="vehicleName" placeholder="Vehicle name (optional)" />
-      <input id="vehicleType" placeholder="Type (Car / Van / etc)" />
-      <input id="vehicleColour" placeholder="Colour" />
+      <input id="regInput" type="text" placeholder="Registration" />
+      <input id="vehicleNameInput" type="text" placeholder="Vehicle name (optional)" />
+      <input id="vehicleTypeInput" type="text" placeholder="Type (Car / Van / etc)" />
+      <input id="vehicleColorInput" type="text" placeholder="Colour" />
+      <input id="alertEmailInput" type="email" placeholder="Email for MOT alerts" />
 
-      <button onclick="checkVehicle()" class="primary-btn">
-        Check Vehicle
-      </button>
+      <button id="checkBtn" class="primary-btn">Check Vehicle</button>
 
-      <div id="result"></div>
+      <div id="resultBox" class="result-box"></div>
 
-      <div style="margin-top: 15px;">
-        <strong>Your Vehicles:</strong>
-        <div id="vehicleList"></div>
-      </div>
+      <h2>Your Vehicles:</h2>
+      <div id="vehicleList"></div>
 
-      <button onclick="logout()" class="logout-btn">Logout</button>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
     </div>
   </div>
 
