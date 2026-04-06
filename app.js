@@ -251,7 +251,7 @@ async function loadVehicles() {
 
   const { data: vehicles } = await client
     .from("vehicles")
-    .select("*")
+    .select("id, reg, make, colour, type, mot_status, mot_days, ax_status, created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
