@@ -38,7 +38,6 @@ function setupAuthButtons() {
   document.getElementById("signupBtn")?.addEventListener("click", signup);
   document.getElementById("logoutBtn")?.addEventListener("click", logout);
   document.getElementById("resetBtn")?.addEventListener("click", resetPassword);
-  document.getElementById("checkBtn")?.addEventListener("click", checkVehicle);
 }
 
 // ==========================
@@ -129,12 +128,13 @@ function getVehicleImage(type) {
 }
 
 // ==========================
-// VEHICLE CHECK (FIXED CLEAN)
+// VEHICLE CHECK
 // ==========================
 async function checkVehicle() {
   const regInput = document.getElementById("regInput");
-  const resultBox = document.getElementById("resultBox");
-  const alertEmail = document.getElementById("alertEmailInput")?.value.trim();
+  const resultBox = document.getElementById("result");
+
+  if (!regInput || !resultBox) return;
 
   const reg = regInput.value.trim().toUpperCase();
 
@@ -146,37 +146,33 @@ async function checkVehicle() {
     return;
   }
 
-  if (!alertEmail) {
-    resultBox.innerHTML = "⚠️ Enter alert email";
-    return;
-  }
-
   let motStatus = "🟢 Valid";
   let taxStatus = "🟢 Taxed";
   let motDays = 999;
 
-  let make = null;
-  let colour = null;
+  let vehicleMake = null;
+  let vehicleColor = null;
   let vehicleType = "Car";
 
   try {
     const response = await fetch(`${window.location.origin}/api/mot?reg=${encodeURIComponent(reg)}`);
     const data = await response.json();
 
-    make = data.make || data.manufacturer || null;
-    colour = data.colour || data.color || null;
+    vehicleMake = data.make || data.vehicleMake || null;
+    vehicleColor = data.colour || data.color || null;
 
-    const makeLower = (make || "").toLowerCase();
+    const makeLower = (vehicleMake || "").toLowerCase();
 
-    if (makeLower.includes("transit") || makeLower.includes("sprinter") || makeLower.includes("crafter")) {
+    if (makeLower.includes("transit") || makeLower.includes("sprinter")) {
       vehicleType = "Van";
-    } else if (makeLower.includes("yamaha") || makeLower.includes("honda") || makeLower.includes("ducati")) {
+    } else if (makeLower.includes("yamaha") || makeLower.includes("honda")) {
       vehicleType = "Motorcycle";
     }
 
     if (data.motExpiryDate) {
       const expiry = new Date(data.motExpiryDate);
       const today = new Date();
+
       motDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
 
       if (motDays < 0) motStatus = "🔴 Expired";
@@ -191,15 +187,6 @@ async function checkVehicle() {
         ? "⚪ SORN"
         : "🔴 Untaxed";
 
-    // EMAIL ALERT (FIXED TO USE INPUT)
-    if (motDays < 30 && motDays > 0) {
-      fetch("/api/sendAlert", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: alertEmail, reg, days: motDays })
-      });
-    }
-
   } catch (err) {
     console.error(err);
     motStatus = "⚠️ Error";
@@ -209,7 +196,7 @@ async function checkVehicle() {
   resultBox.innerHTML = `
     <div class="result-card">
       <div class="reg">${reg}</div>
-      <div class="meta">${make || ""} ${colour || ""}</div>
+      <div class="meta">${vehicleMake || ""} ${vehicleColor || ""}</div>
       <div class="badges">
         <span class="badge">${motStatus} (${motDays} days)</span>
         <span class="badge">${taxStatus}</span>
@@ -235,13 +222,56 @@ async function checkVehicle() {
         mot_status: motStatus,
         mot_days: motDays,
         tax_status: taxStatus,
-        make,
-        colour,
-        vehicle_type: vehicleType,
-        alert_email: alertEmail
-      }
+        make: vehicleMake,
+        colour: vehicleColor,
+        type: vehicleType,
+      },
     ]);
   }
 
   loadVehicles();
+}
+
+// ==========================
+// LOAD VEHICLES (RESTORED)
+// ==========================
+async function loadVehicles() {
+  if (isLoadingVehicles) return;
+  isLoadingVehicles = true;
+
+  const list = document.getElementById("vehicleList");
+  if (!list) return;
+
+  list.innerHTML = "";
+
+  const { data } = await client.auth.getUser();
+  const user = data?.user;
+  if (!user) return;
+
+  const { data: vehicles } = await client
+    .from("vehicles")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (!vehicles || vehicles.length === 0) {
+    list.innerHTML = "<p>No vehicles yet</p>";
+    isLoadingVehicles = false;
+    return;
+  }
+
+  for (const v of vehicles) {
+    const row = document.createElement("div");
+    row.className = "vehicle-card";
+
+    row.innerHTML = `
+      <div>${v.reg} - ${v.make || ""}</div>
+      <div>${v.mot_status} (${v.mot_days} days)</div>
+      <div>${v.tax_status}</div>
+    `;
+
+    list.appendChild(row);
+  }
+
+  isLoadingVehicles = false;
 }
