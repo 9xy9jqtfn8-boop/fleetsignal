@@ -225,7 +225,7 @@ async function checkVehicle() {
         tax_status: taxStatus,
         make: vehicleMake,
         colour: vehicleColor,
-        type: vehicleType,
+        vehicle_type: vehicleType,
       },
     ]);
   }
@@ -251,7 +251,7 @@ async function loadVehicles() {
 
   const { data: vehicles } = await client
     .from("vehicles")
-    .select("id, reg, make, colour, type, mot_status, mot_days, ax_status, created_at")
+    .select("id, reg, make, colour, vehicle_type, mot_status, mot_days, ax_status, created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
