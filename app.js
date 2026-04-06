@@ -3,134 +3,176 @@
 // =======================
 const SUPABASE_URL = "https://bufhopdljmpaerrvigay.supabase.co";
 const SUPABASE_KEY = "sb_publishable_syvITTAJPgDewBp19skDkQ_TGnU6u7d";
-
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// =======================
-// SAFE UI GETTERS (prevents crashes)
-// =======================
-const getEl = (id) => document.getElementById(id);
+// ==========================
+// UI ELEMENTS
+// ==========================
+const authBox = document.getElementById("authBox");
+const dashboardBox = document.getElementById("dashboardBox");
+const authMessage = document.getElementById("authMessage");
 
-// =======================
+let isLoadingVehicles = false;
+
+// ==========================
 // INIT
-// =======================
+// ==========================
 document.addEventListener("DOMContentLoaded", () => {
-  setupButtons();
-  checkSession();
+  initApp();
 });
 
-// =======================
-// BUTTONS
-// =======================
-function setupButtons() {
-  getEl("loginBtn")?.addEventListener("click", login);
-  getEl("signupBtn")?.addEventListener("click", signup);
-  getEl("checkBtn")?.addEventListener("click", checkVehicle);
-  getEl("logoutBtn")?.addEventListener("click", logout);
+function initApp() {
+  setupAuthButtons();
+
+  authBox?.classList.remove("hidden");
+  dashboardBox?.classList.add("hidden");
+
+  checkSession();
 }
 
-// =======================
-// SESSION
-// =======================
-async function checkSession() {
-  const { data } = await client.auth.getSession();
-
-  if (data?.session?.user) {
-    showDashboard();
-    await loadVehicles();
-  } else {
-    showAuth();
-  }
+// ==========================
+// AUTH BUTTONS
+// ==========================
+function setupAuthButtons() {
+  document.getElementById("loginBtn")?.addEventListener("click", login);
+  document.getElementById("signupBtn")?.addEventListener("click", signup);
+  document.getElementById("logoutBtn")?.addEventListener("click", logout);
+  document.getElementById("resetBtn")?.addEventListener("click", resetPassword);
+  document.getElementById("checkBtn")?.addEventListener("click", checkVehicle);
 }
 
-function showAuth() {
-  getEl("authBox")?.classList.remove("hidden");
-  getEl("dashboardBox")?.classList.add("hidden");
-}
-
-function showDashboard() {
-  getEl("authBox")?.classList.add("hidden");
-  getEl("dashboardBox")?.classList.remove("hidden");
-}
-
-// =======================
+// ==========================
 // AUTH
-// =======================
+// ==========================
 async function signup() {
-  const email = getEl("email")?.value.trim();
-  const password = getEl("password")?.value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
-  if (!email || !password) return alert("Enter email + password");
+  if (!email || !password) {
+    authMessage.innerText = "Enter email and password.";
+    return;
+  }
 
   const { error } = await client.auth.signUp({ email, password });
 
-  alert(error ? error.message : "Signup successful");
+  authMessage.innerText = error
+    ? error.message
+    : "Signup successful. Check your email.";
 }
 
 async function login() {
-  const email = getEl("email")?.value.trim();
-  const password = getEl("password")?.value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
-  if (!email || !password) return alert("Enter email + password");
+  const { error } = await client.auth.signInWithPassword({ email, password });
 
-  const { error } = await client.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  if (error) return alert(error.message);
-
-  showDashboard();
-  await loadVehicles();
+  if (error) {
+    authMessage.innerText = error.message;
+  } else {
+    authMessage.innerText = "";
+    showDashboard();
+  }
 }
 
 async function logout() {
   await client.auth.signOut();
-  location.reload();
+  authBox?.classList.remove("hidden");
+  dashboardBox?.classList.add("hidden");
 }
 
-// =======================
-// MAIN FUNCTION
-// =======================
+async function resetPassword() {
+  const email = document.getElementById("email").value.trim();
+
+  const { error } = await client.auth.resetPasswordForEmail(email, {
+    redirectTo: "https://www.getfleetsignal.com/reset-password.html",
+  });
+
+  authMessage.innerText = error
+    ? error.message
+    : "Password reset email sent.";
+}
+
+// ==========================
+// SESSION
+// ==========================
+async function checkSession() {
+  const { data } = await client.auth.getSession();
+
+  if (data.session) {
+    showDashboard();
+  }
+}
+
+function showDashboard() {
+  authBox?.classList.add("hidden");
+  dashboardBox?.classList.remove("hidden");
+
+  loadVehicles();
+
+  setTimeout(() => {
+    document.getElementById("regInput")?.focus();
+  }, 200);
+}
+
+// ==========================
+// ICON HELPER
+// ==========================
+function getVehicleImage(type) {
+  if (!type) return "/icons/car.png";
+
+  const t = type.toLowerCase();
+
+  if (t.includes("van")) return "/icons/van.png";
+  if (t.includes("motorcycle")) return "/icons/bike.png";
+
+  return "/icons/car.png";
+}
+
+// ==========================
+// VEHICLE CHECK (FIXED CLEAN)
+// ==========================
 async function checkVehicle() {
-  const reg = getEl("regInput")?.value.trim().toUpperCase();
-  const name = getEl("vehicleNameInput")?.value.trim() || "Vehicle";
-  const typeInput = getEl("vehicleTypeInput")?.value.trim();
-  const colourInput = getEl("vehicleColourInput")?.value.trim(); // FIXED
-  const alertEmail = getEl("alertEmailInput")?.value.trim();
-  const vehicleName = document.getElementById("vehicleNameInput").value;
+  const regInput = document.getElementById("regInput");
+  const resultBox = document.getElementById("result");
+  const alertEmail = document.getElementById("alertEmailInput")?.value.trim();
 
-  if (!reg) return alert("Enter registration");
-  if (!alertEmail) return alert("Enter email");
+  const reg = regInput.value.trim().toUpperCase();
 
-  const { data } = await client.auth.getUser();
-  const user = data?.user;
-  if (!user) return alert("Login required");
+  resultBox.style.display = "block";
+  resultBox.innerHTML = "⏳ Checking vehicle...";
+
+  if (!reg) {
+    resultBox.innerHTML = "⚠️ Enter a registration";
+    return;
+  }
+
+  if (!alertEmail) {
+    resultBox.innerHTML = "⚠️ Enter alert email";
+    return;
+  }
+
+  let motStatus = "🟢 Valid";
+  let taxStatus = "🟢 Taxed";
+  let motDays = 999;
+
+  let make = null;
+  let colour = null;
+  let vehicleType = "Car";
 
   try {
-    // =======================
-    // FETCH MOT DATA
-    // =======================
-    const res = await fetch(`/api/mot?reg=${encodeURIComponent(reg)}`);
-    if (!res.ok) throw new Error("MOT fetch failed");
+    const response = await fetch(`${window.location.origin}/api/mot?reg=${encodeURIComponent(reg)}`);
+    const data = await response.json();
 
-    const data = await res.json();
+    make = data.make || data.manufacturer || null;
+    colour = data.colour || data.color || null;
 
-    const make = (data.make || "").toUpperCase();
-    const colour = (colourInput || data.colour || "Unknown").toUpperCase();
-    let vehicleType = typeInput || "Car";
+    const makeLower = (make || "").toLowerCase();
 
-    // Simple type detection
-    const makeLower = make.toLowerCase();
-    if (makeLower.includes("transit") || makeLower.includes("van")) {
+    if (makeLower.includes("transit") || makeLower.includes("sprinter") || makeLower.includes("crafter")) {
       vehicleType = "Van";
+    } else if (makeLower.includes("yamaha") || makeLower.includes("honda") || makeLower.includes("ducati")) {
+      vehicleType = "Motorcycle";
     }
-
-    // =======================
-    // MOT STATUS
-    // =======================
-    let motStatus = "🟢 Valid";
-    let motDays = 999;
 
     if (data.motExpiryDate) {
       const expiry = new Date(data.motExpiryDate);
@@ -139,57 +181,17 @@ async function checkVehicle() {
 
       if (motDays < 0) motStatus = "🔴 Expired";
       else if (motDays < 7) motStatus = "🔴 Expiring";
-      else if (motDays < 30) motStatus = "🟡 Soon";
+      else if (motDays < 30) motStatus = "🟡 Due soon";
     }
 
-    const taxStatus =
+    taxStatus =
       data.taxStatus === "Taxed"
         ? "🟢 Taxed"
         : data.taxStatus === "SORN"
         ? "⚪ SORN"
         : "🔴 Untaxed";
 
-    // =======================
-    // SHOW RESULT
-    // =======================
-    getEl("resultBox").innerHTML = `
-      <div class="result-card">
-        <div><strong>${reg}</strong></div>
-        <div>${make} ${colour}</div>
-        <div>${motStatus} (${motDays} days)</div>
-        <div>${taxStatus}</div>
-      </div>
-    `;
-
-    // =======================
-    // SAVE TO DATABASE (CLEAN)
-    // =======================
-  const payload = {
-  user_id: user.id,
-  reg: reg,
-  name: vehicleName || "Vehicle",
-  make: vehicleMake || "",
-  vehicle_type: vehicleType || "Car",
-  colour: vehicleColour || "Unknown",
-  mot_status: motStatus,
-  mot_days: motDays,
-  tax_status: taxStatus,
-  alert_email: alertEmail
-};
-
-const { error } = await client
-  .from("vehicles")
-  .upsert([payload], {
-    onConflict: "user_id,reg"
-  });
-
-if (error) {
-  console.error("DB error:", error);
-}
-
-    // =======================
-    // EMAIL ALERT
-    // =======================
+    // EMAIL ALERT (FIXED TO USE INPUT)
     if (motDays < 30 && motDays > 0) {
       fetch("/api/sendAlert", {
         method: "POST",
@@ -198,41 +200,48 @@ if (error) {
       });
     }
 
-    await loadVehicles();
   } catch (err) {
     console.error(err);
-    getEl("resultBox").innerHTML = "Error checking vehicle";
+    motStatus = "⚠️ Error";
+    taxStatus = "⚠️ Failed";
   }
-}
 
-// =======================
-// LOAD VEHICLES
-// =======================
-async function loadVehicles() {
+  resultBox.innerHTML = `
+    <div class="result-card">
+      <div class="reg">${reg}</div>
+      <div class="meta">${make || ""} ${colour || ""}</div>
+      <div class="badges">
+        <span class="badge">${motStatus} (${motDays} days)</span>
+        <span class="badge">${taxStatus}</span>
+      </div>
+    </div>
+  `;
+
   const { data } = await client.auth.getUser();
   const user = data?.user;
   if (!user) return;
 
-  const { data: vehicles } = await client
+  const { data: existing } = await client
     .from("vehicles")
     .select("*")
     .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+    .eq("reg", reg);
 
-  if (!vehicles || vehicles.length === 0) {
-    getEl("vehicleList").innerHTML = "<p>No vehicles yet</p>";
-    return;
+  if (!existing || existing.length === 0) {
+    await client.from("vehicles").insert([
+      {
+        user_id: user.id,
+        reg,
+        mot_status: motStatus,
+        mot_days: motDays,
+        tax_status: taxStatus,
+        make,
+        colour,
+        vehicle_type: vehicleType,
+        alert_email: alertEmail
+      }
+    ]);
   }
 
-  getEl("vehicleList").innerHTML = vehicles
-    .map(
-      (v) => `
-    <div class="vehicle-card">
-      <strong>${v.reg}</strong><br>
-      ${v.name}<br>
-      ${v.mot_status} (${v.mot_days ?? "-"} days)
-    </div>
-  `
-    )
-    .join("");
+  loadVehicles();
 }
