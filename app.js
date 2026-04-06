@@ -98,6 +98,7 @@ async function checkVehicle() {
   const typeInput = getEl("vehicleTypeInput")?.value.trim();
   const colourInput = getEl("vehicleColourInput")?.value.trim(); // FIXED
   const alertEmail = getEl("alertEmailInput")?.value.trim();
+  const vehicleName = document.getElementById("vehicleNameInput").value;
 
   if (!reg) return alert("Enter registration");
   if (!alertEmail) return alert("Enter email");
