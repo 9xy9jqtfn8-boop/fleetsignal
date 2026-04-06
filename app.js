@@ -35,6 +35,7 @@ function initApp() {
 // ==========================
 function setupAuthButtons() {
   document.getElementById("loginBtn")?.addEventListener("click", login);
+  document.getElementById("checkBtn")?.addEventListener("click", checkVehicle);
   document.getElementById("signupBtn")?.addEventListener("click", signup);
   document.getElementById("logoutBtn")?.addEventListener("click", logout);
   document.getElementById("resetBtn")?.addEventListener("click", resetPassword);
@@ -132,7 +133,7 @@ function getVehicleImage(type) {
 // ==========================
 async function checkVehicle() {
   const regInput = document.getElementById("regInput");
-  const resultBox = document.getElementById("result");
+  const resultBox = document.getElementById("resultBox");
 
   if (!regInput || !resultBox) return;
 
