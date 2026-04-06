@@ -177,7 +177,7 @@ async function checkVehicle() {
     };
 
     const { error } = await client.from("vehicles").upsert(payload, {
-      onConflict: "reg,user_id"
+      onConflict: "user_id,reg"
     });
 
     if (error) console.error("DB error:", error);
