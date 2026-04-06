@@ -163,24 +163,28 @@ async function checkVehicle() {
     // =======================
     // SAVE TO DATABASE (CLEAN)
     // =======================
-    const payload = {
-      user_id: user.id,
-      reg,
-      name,
-      make,
-      vehicle_type: vehicleType,
-      colour,
-      mot_status: motStatus,
-      mot_days: motDays,
-      tax_status: taxStatus,
-      alert_email: alertEmail
-    };
+  const payload = {
+  user_id: user.id,
+  reg: reg,
+  name: vehicleName || "Vehicle",
+  make: vehicleMake || "",
+  vehicle_type: vehicleType || "Car",
+  colour: vehicleColour || "Unknown",
+  mot_status: motStatus,
+  mot_days: motDays,
+  tax_status: taxStatus,
+  alert_email: alertEmail
+};
 
-    const { error } = await client.from("vehicles").upsert(payload, {
-      onConflict: "user_id,reg"
-    });
+const { error } = await client
+  .from("vehicles")
+  .upsert([payload], {
+    onConflict: "user_id,reg"
+  });
 
-    if (error) console.error("DB error:", error);
+if (error) {
+  console.error("DB error:", error);
+}
 
     // =======================
     // EMAIL ALERT
