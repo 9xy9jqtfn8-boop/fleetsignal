@@ -133,7 +133,7 @@ function getVehicleImage(type) {
 // ==========================
 async function checkVehicle() {
   const regInput = document.getElementById("regInput");
-  const resultBox = document.getElementById("result");
+  const resultBox = document.getElementById("resultBox");
   const alertEmail = document.getElementById("alertEmailInput")?.value.trim();
 
   const reg = regInput.value.trim().toUpperCase();
