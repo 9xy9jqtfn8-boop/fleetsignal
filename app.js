@@ -271,7 +271,7 @@ async function checkVehicle() {
 
   let motStatus = "🟢 Valid";
   let taxStatus = "🟢 Taxed";
-  let motDays = 999;
+  let motDays = null;
 
   let vehicleMake = "";
   let vehicleColor = "";
@@ -311,15 +311,20 @@ async function checkVehicle() {
     }
 
     if (data.motExpiryDate) {
-      const expiry = new Date(data.motExpiryDate);
-      const today = new Date();
-      motDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+  const expiry = new Date(data.motExpiryDate);
+  const today = new Date();
 
-      if (motDays < 0) motStatus = "🔴 Expired";
-      else if (motDays < 7) motStatus = "🔴 Expiring";
-      else if (motDays < 30) motStatus = "🟡 Due soon";
-    }
+  motDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
 
+  if (motDays < 0) motStatus = "🔴 Expired";
+  else if (motDays < 7) motStatus = "🔴 Expiring";
+  else if (motDays < 30) motStatus = "🟡 Due soon";
+  else motStatus = "🟢 Valid";
+} else {
+  motStatus = "⚪ Unknown";
+  motDays = "-";
+}
+    
     taxStatus =
       data.taxStatus === "Taxed"
         ? "🟢 Taxed"
@@ -385,23 +390,33 @@ async function checkVehicle() {
     };
 
     if (existing && existing.length > 0) {
-      const { error: updateError } = await client
-        .from("vehicles")
-        .update(payload)
-        .eq("id", existing[0].id);
-
-      if (updateError) {
-        console.error("Vehicle update failed:", updateError);
-      }
-    } else {
-      const { error: insertError } = await client
-        .from("vehicles")
-        .insert([payload]);
-
-      if (insertError) {
-        console.error("Vehicle insert failed:", insertError);
-      }
+  await client
+    .from("vehicles")
+    .update({
+      mot_status: motStatus,
+      mot_days: motDays,
+      tax_status: taxStatus,
+      make: vehicleMake,
+      colour: vehicleColor,
+      vehicle_type: vehicleType,
+      alert_email: alertEmail || null
+    })
+    .eq("id", existing[0].id);
+} else {
+  await client.from("vehicles").insert([
+    {
+      user_id: user.id,
+      reg,
+      mot_status: motStatus,
+      mot_days: motDays,
+      tax_status: taxStatus,
+      make: vehicleMake,
+      colour: vehicleColor,
+      vehicle_type: vehicleType,
+      alert_email: alertEmail || null
     }
+  ]);
+}
 
     await sendReminderIfNeeded({
       reg,
