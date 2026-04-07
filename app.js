@@ -117,7 +117,7 @@ function showDashboard() {
 // ==========================
 // ICON HELPER
 // ==========================
-function getVehicleImage(type) {
+function getVehicleImage(v.vehicle_type) {
   if (!type) return "/icons/car.png";
 
   const t = type.toLowerCase();
@@ -226,6 +226,7 @@ async function checkVehicle() {
         make: vehicleMake,
         colour: vehicleColor,
         vehicle_type: vehicleType,
+        alert_email: alertEmail
       },
     ]);
   }
@@ -234,26 +235,40 @@ async function checkVehicle() {
 }
 
 // ==========================
-// LOAD VEHICLES (RESTORED)
+// LOAD VEHICLES
 // ==========================
 async function loadVehicles() {
   if (isLoadingVehicles) return;
   isLoadingVehicles = true;
 
   const list = document.getElementById("vehicleList");
-  if (!list) return;
+  if (!list) {
+    isLoadingVehicles = false;
+    return;
+  }
 
   list.innerHTML = "";
 
-  const { data } = await client.auth.getUser();
-  const user = data?.user;
-  if (!user) return;
+  const { data: authData } = await client.auth.getUser();
+  const user = authData?.user;
 
-  const { data: vehicles } = await client
+  if (!user) {
+    isLoadingVehicles = false;
+    return;
+  }
+
+  const { data: vehicles, error } = await client
     .from("vehicles")
-    .select("id, reg, make, colour, vehicle_type, mot_status, mot_days, ax_status, created_at")
+    .select("id, reg, make, colour, vehicle_type, mot_status, mot_days, tax_status, created_at, alert_email")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Load vehicles failed:", error);
+    list.innerHTML = "<p>Could not load vehicles.</p>";
+    isLoadingVehicles = false;
+    return;
+  }
 
   if (!vehicles || vehicles.length === 0) {
     list.innerHTML = "<p>No vehicles yet</p>";
@@ -262,14 +277,46 @@ async function loadVehicles() {
   }
 
   for (const v of vehicles) {
+    let colorClass = "grey";
+    if (v.mot_status?.includes("Expired")) colorClass = "red";
+    else if (v.mot_status?.includes("Due soon")) colorClass = "yellow";
+    else if (v.mot_status?.includes("Valid")) colorClass = "green";
+
     const row = document.createElement("div");
     row.className = "vehicle-card";
 
     row.innerHTML = `
-      <div>${v.reg} - ${v.make || ""}</div>
-      <div>${v.mot_status} (${v.mot_days} days)</div>
-      <div>${v.tax_status}</div>
+      <div class="vehicle-header">
+        <img src="${getVehicleImage(v.vehicle_type)}" class="vehicle-icon"/>
+
+        <div>
+          <div class="vehicle-title">${v.reg}</div>
+          <div class="vehicle-meta">
+            ${v.make || "Vehicle"} • ${v.vehicle_type || "Car"} • ${v.colour || "Unknown"}
+          </div>
+          <div class="vehicle-meta">
+            ${v.alert_email || ""}
+          </div>
+        </div>
+
+        <button class="delete-btn">✕</button>
+      </div>
+
+      <div class="vehicle-stats">
+        <span class="badge ${colorClass}">
+          ● MOT: ${v.mot_status || "Unknown"} (${v.mot_days ?? "-"} days)
+        </span>
+
+        <span class="badge grey">
+          ● TAX: ${v.tax_status || "Unknown"}
+        </span>
+      </div>
     `;
+
+    row.querySelector(".delete-btn").addEventListener("click", async () => {
+      await client.from("vehicles").delete().eq("id", v.id);
+      loadVehicles();
+    });
 
     list.appendChild(row);
   }
