@@ -375,11 +375,10 @@ async function checkVehicle() {
     const payload = {
       user_id: user.id,
       reg,
-      name: finalName,
       mot_status: motStatus,
       mot_days: motDays,
       tax_status: taxStatus,
-      make: vehicleMake || finalName,
+      make: vehicleMake || null,
       colour: finalColour || null,
       vehicle_type: finalType,
       alert_email: alertEmail || null,
@@ -455,7 +454,7 @@ async function loadVehicles() {
     const firstAttempt = await client
       .from("vehicles")
       .select(
-        "id, reg, name, make, colour, vehicle_type, mot_status, mot_days, tax_status, alert_email"
+       "id, reg, make, colour, vehicle_type, mot_status, mot_days, tax_status, alert_email"
       )
       .eq("user_id", user.id)
       .order("id", { ascending: false });
@@ -470,7 +469,7 @@ async function loadVehicles() {
       const fallbackAttempt = await client
         .from("vehicles")
         .select(
-          "id, reg, name, make, colour, vehicle_type, mot_status, mot_days, tax_status, alert_email"
+          "id, reg, make, colour, vehicle_type, mot_status, mot_days, tax_status, alert_email"
         )
         .eq("user_id", user.id);
 
@@ -502,7 +501,7 @@ async function loadVehicles() {
       }
 
       const safeReg = escapeHtml(v.reg || "");
-      const safeMake = escapeHtml(v.make || v.name || "Vehicle");
+      const safeMake = escapeHtml(v.make || "Vehicle");
       const safeType = escapeHtml(v.vehicle_type || "Car");
       const safeColour = escapeHtml(v.colour || "Unknown");
       const safeAlertEmail = escapeHtml(v.alert_email || "");
