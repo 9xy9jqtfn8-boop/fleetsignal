@@ -117,7 +117,7 @@ function showDashboard() {
 // ==========================
 // ICON HELPER
 // ==========================
-function getVehicleImage(v.vehicle_type) {
+function getVehicleImage(type) {
   if (!type) return "/icons/car.png";
 
   const t = type.toLowerCase();
