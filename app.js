@@ -455,10 +455,10 @@ async function loadVehicles() {
     const firstAttempt = await client
       .from("vehicles")
       .select(
-        "id, reg, name, make, colour, vehicle_type, mot_status, mot_days, tax_status, created_at, alert_email"
+        "id, reg, name, make, colour, vehicle_type, mot_status, mot_days, tax_status, alert_email"
       )
       .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+      .order("id", { ascending: false });
 
     vehicles = firstAttempt.data;
     error = firstAttempt.error;
