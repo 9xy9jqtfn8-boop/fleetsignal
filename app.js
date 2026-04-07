@@ -325,3 +325,22 @@ async function loadVehicles() {
 
   isLoadingVehicles = false;
 }
+
+document.getElementById("forgotPasswordLink")?.addEventListener("click", async () => {
+  const email = document.getElementById("email").value;
+
+  if (!email) {
+    alert("Enter your email first");
+    return;
+  }
+
+  const { error } = await client.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + "/reset.html"
+  });
+
+  if (error) {
+    alert("Error sending reset email");
+  } else {
+    alert("Password reset email sent");
+  }
+});
