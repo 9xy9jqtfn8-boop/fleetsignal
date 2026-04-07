@@ -230,7 +230,7 @@ async function sendReminderIfNeeded({ reg, motDays, alertEmail }) {
       body: JSON.stringify({
         email: alertEmail,
         reg,
-        days: motDays,
+        motDays: motDays,
       }),
     });
 
