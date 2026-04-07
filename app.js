@@ -1,3 +1,5 @@
+//VERSION 2 FORCE DEPLOY
+
 // =======================
 // SUPABASE SETUP
 // =======================
