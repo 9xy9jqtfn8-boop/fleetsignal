@@ -367,7 +367,7 @@ async function checkVehicle() {
 
     const { data: existing, error: existingError } = await client
       .from("vehicles")
-      .select("id")
+      .select("id, last_alert_sent")
       .eq("user_id", user.id)
       .eq("reg", reg)
       .limit(1);
@@ -418,11 +418,37 @@ async function checkVehicle() {
   ]);
 }
 
-    await sendReminderIfNeeded({
-      reg,
-      motDays,
-      alertEmail,
-    });
+    let shouldSendAlert = false;
+
+if (alertEmail && typeof motDays === "number" && motDays < 30) {
+  const lastSent = existing?.[0]?.last_alert_sent
+    ? new Date(existing[0].last_alert_sent)
+    : null;
+
+  const now = new Date();
+
+  const daysSinceLastAlert = lastSent
+    ? (now - lastSent) / (1000 * 60 * 60 * 24)
+    : null;
+
+  if (!lastSent || daysSinceLastAlert >= 7) {
+    shouldSendAlert = true;
+  }
+}
+
+if (shouldSendAlert) {
+  await sendReminderIfNeeded({
+    reg,
+    motDays,
+    alertEmail,
+  });
+
+  // update last sent time
+  await client
+    .from("vehicles")
+    .update({ last_alert_sent: new Date().toISOString() })
+    .eq("id", existing[0].id);
+}
 
     await loadVehicles();
   } catch (err) {
