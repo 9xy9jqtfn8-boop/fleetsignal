@@ -259,8 +259,10 @@ async function checkVehicle() {
   const manualName = vehicleNameInput?.value.trim() || "";
   const manualType = vehicleTypeInput?.value.trim() || "";
   const manualColour = vehicleColourInput?.value.trim() || "";
-  const alertEmail = alertEmailInput?.value.trim() || "";
-
+  const alertsEnabled = getEl("alertsToggle")?.checked;
+  const alertEmail = alertsEnabled
+  ? (alertEmailInput?.value.trim() || "")
+  : "";
   resultBox.style.display = "block";
   resultBox.innerHTML = "⏳ Checking vehicle...";
 

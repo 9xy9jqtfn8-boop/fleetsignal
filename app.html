@@ -35,14 +35,18 @@
       <h1>🚗 Fleet Dashboard</h1>
 
       <input id="regInput" type="text" placeholder="Registration" />
-      <input id="alertEmailInput" placeholder="Enter email for alerts" />
-      <button onclick="saveAlertEmail()" class="primary-btn">Enable Alerts</button>
+      <input id="alertEmailInput" type="email" placeholder="Email for MOT alerts" />
+   <div class="alert-toggle-row">
+      <label class="switch">
+       <input type="checkbox" id="alertsToggle">
+       <span class="slider"></span>
+      </label>
+     <span id="alertsLabel">Alerts OFF</span>
+   </div>
       <input id="vehicleNameInput" type="text" placeholder="Vehicle name (optional)" />
       <input id="vehicleTypeInput" type="text" placeholder="Type (Car / Van / etc)" />
       <input id="vehicleColourInput" type="text" placeholder="Colour" />
       <input id="alertEmailInput" type="email" placeholder="Email for MOT alerts" />
-
-      <button id="checkBtn" class="primary-btn">Check Vehicle</button>
 
       <div id="resultBox" class="result-box"></div>
 
