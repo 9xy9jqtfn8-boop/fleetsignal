@@ -66,6 +66,18 @@ function initApp() {
   authBox?.classList.remove("hidden");
   dashboardBox?.classList.add("hidden");
 
+  const toggle = getEl("alertsToggle");
+  const label = getEl("alertsLabel");
+
+if (toggle && label) {
+ toggle.addEventListener("change", () => {
+   if (toggle.checked) {
+     label.innerText = "Alerts ON";
+   } else {
+     label.innerText = "Alerts OFF";
+   }
+ });
+}
   checkSession();
 }
 
