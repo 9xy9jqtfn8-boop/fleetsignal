@@ -436,47 +436,6 @@ async function checkVehicle() {
   }
 }
 
-    // ==========================
-    // ALERT LOGIC
-    // ==========================
-    let shouldSendAlert = false;
-
-    if (alertEmail && typeof motDays === "number" && motDays < 30) {
-      const lastSent = existing?.[0]?.last_alert_sent
-        ? new Date(existing[0].last_alert_sent)
-        : null;
-
-      const now = new Date();
-
-      const daysSinceLastAlert = lastSent
-        ? (now - lastSent) / (1000 * 60 * 60 * 24)
-        : null;
-
-      if (!lastSent || daysSinceLastAlert >= 7) {
-        shouldSendAlert = true;
-      }
-    }
-
-    if (shouldSendAlert && vehicleId) {
-      await sendReminderIfNeeded({
-        reg,
-        motDays,
-        alertEmail,
-      });
-
-      await client
-        .from("vehicles")
-        .update({ last_alert_sent: new Date().toISOString() })
-        .eq("id", vehicleId);
-    }
-
-    await loadVehicles();
-
-  } catch (err) {
-    console.error("Vehicle save flow failed:", err);
-  }
-}
-
 // ==========================
 // LOAD VEHICLES
 // ==========================
