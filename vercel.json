@@ -1,5 +1,12 @@
 {
   "routes": [
-    { "src": "/", "dest": "/app.html" }
+    {
+      "src": "^/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/app.html"
+    }
   ]
 }
