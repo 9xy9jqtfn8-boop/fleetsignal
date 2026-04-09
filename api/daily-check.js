@@ -9,6 +9,13 @@ const supabase = createClient(
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req, res) {
+
+  const secret = req.query.secret;
+
+  if (!secret || secret !== process.env.CRON_SECRET) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
     const now = new Date();
 
