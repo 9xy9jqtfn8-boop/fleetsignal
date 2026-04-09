@@ -243,7 +243,7 @@ async function sendReminderIfNeeded({ reg, motDays, alertEmail }) {
 }
 
 // ==========================
-// VEHICLE CHECK
+// VEHICLE CHECK (FIXED + SAFE)
 // ==========================
 async function checkVehicle() {
   const regInput = getEl("regInput");
@@ -322,7 +322,7 @@ async function checkVehicle() {
       else motStatus = "🟢 Valid";
     } else {
       motStatus = "⚪ Unknown";
-      motDays = "-";
+      motDays = null;
     }
 
     taxStatus =
@@ -331,94 +331,110 @@ async function checkVehicle() {
         : data.taxStatus === "SORN"
         ? "⚪ SORN"
         : "🔴 Untaxed";
+
   } catch (err) {
     console.error("Vehicle check failed:", err);
     motStatus = "⚠️ Error";
     taxStatus = "⚠️ Failed";
-    motDays = -1;
+    motDays = null;
   }
 
-  // manual overrides
+  // FINAL VALUES (consistent everywhere)
   const finalName = manualName || vehicleMake || "Vehicle";
   const finalColour = manualColour || vehicleColor || "";
   const finalType = normaliseVehicleType(manualType || vehicleType);
 
+  // UI RESULT
   resultBox.innerHTML = `
     <div class="result-card">
       <div class="reg">${escapeHtml(reg)}</div>
-      <div class="meta">${escapeHtml(vehicleMake || "")} ${escapeHtml(finalColour || "")}</div>
+      <div class="meta">${escapeHtml(vehicleMake || "")} ${escapeHtml(finalColour)}</div>
       <div class="badges">
-        <span class="badge">${escapeHtml(motStatus)} (${escapeHtml(motDays)} days)</span>
+        <span class="badge">${escapeHtml(motStatus)} (${motDays ?? "-" } days)</span>
         <span class="badge">${escapeHtml(taxStatus)}</span>
       </div>
     </div>
   `;
 
   try {
-    const { data: authData, error: authError } = await client.auth.getUser();
-
-    if (authError) {
-      console.error("Get user failed:", authError);
-      return;
-    }
-
+    const { data: authData } = await client.auth.getUser();
     const user = authData?.user;
     if (!user) return;
 
-    let { data: existing, error: existingError } = await client
+    const { data: existing } = await client
       .from("vehicles")
       .select("id, last_alert_sent")
       .eq("user_id", user.id)
       .eq("reg", reg)
       .limit(1);
 
-    if (existingError) {
-      console.error("Existing vehicle lookup failed:", existingError);
-      return;
-    }
+    const payload = {
+      user_id: user.id,
+      reg,
+      mot_status: motStatus,
+      mot_days: motDays,
+      tax_status: taxStatus,
+      make: vehicleMake || null,
+      colour: finalColour || null,
+      vehicle_type: finalType,
+      alert_email: alertEmail || null,
+    };
 
     let vehicleId = null;
+    let lastAlertSent = null;
 
     if (existing && existing.length > 0) {
       vehicleId = existing[0].id;
+      lastAlertSent = existing[0].last_alert_sent;
 
       await client
         .from("vehicles")
-        .update({
-          mot_status: motStatus,
-          mot_days: motDays,
-          tax_status: taxStatus,
-          make: vehicleMake,
-          colour: finalColour,
-          vehicle_type: finalType,
-          alert_email: alertEmail || null
-        })
+        .update(payload)
         .eq("id", vehicleId);
     } else {
-      const { data: inserted, error: insertError } = await client
+      const { data: inserted } = await client
         .from("vehicles")
-        .insert([
-          {
-            user_id: user.id,
-            reg,
-            mot_status: motStatus,
-            mot_days: motDays,
-            tax_status: taxStatus,
-            make: vehicleMake,
-            colour: finalColour,
-            vehicle_type: finalType,
-            alert_email: alertEmail || null
-          }
-        ])
+        .insert([payload])
         .select();
-
-      if (insertError) {
-        console.error("Insert failed:", insertError);
-        return;
-      }
 
       vehicleId = inserted?.[0]?.id;
     }
+
+    // ALERT LOGIC (safe)
+    let shouldSendAlert = false;
+
+    if (alertEmail && typeof motDays === "number" && motDays < 30) {
+      const lastSent = lastAlertSent ? new Date(lastAlertSent) : null;
+      const now = new Date();
+
+      const daysSince =
+        lastSent ? (now - lastSent) / (1000 * 60 * 60 * 24) : null;
+
+      if (!lastSent || daysSince >= 7) {
+        shouldSendAlert = true;
+      }
+    }
+
+    if (shouldSendAlert && vehicleId) {
+      await sendReminderIfNeeded({
+        reg,
+        motDays,
+        alertEmail,
+      });
+
+      await client
+        .from("vehicles")
+        .update({ last_alert_sent: new Date().toISOString() })
+        .eq("id", vehicleId);
+    }
+
+    // 🔥 THIS FIXES YOUR MISSING LIST
+    await loadVehicles();
+
+  } catch (err) {
+    console.error("Vehicle save flow failed:", err);
+  }
+}
 
     // ==========================
     // ALERT LOGIC
