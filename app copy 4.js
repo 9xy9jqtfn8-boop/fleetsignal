@@ -67,30 +67,17 @@ function initApp() {
   dashboardBox?.classList.add("hidden");
 
   const toggle = getEl("alertsToggle");
-const label = getEl("alertsLabel");
-const emailInput = getEl("alertEmailInput");
+  const label = getEl("alertsLabel");
 
-if (toggle && label && emailInput) {
-
-  const updateUI = () => {
-    if (toggle.checked) {
-      label.innerHTML = "🟢 Alerts ON";
-      emailInput.disabled = false;
-      emailInput.style.opacity = "1";
-    } else {
-      label.innerHTML = "⚪ Alerts OFF";
-      emailInput.disabled = true;
-      emailInput.style.opacity = "0.5";
-      emailInput.value = "";
-    }
-  };
-
-  toggle.addEventListener("change", updateUI);
-
-  // 🔥 IMPORTANT — runs on page load
-  updateUI();
+if (toggle && label) {
+ toggle.addEventListener("change", () => {
+   if (toggle.checked) {
+     label.innerText = "Alerts ON";
+   } else {
+     label.innerText = "Alerts OFF";
+   }
+ });
 }
-
   checkSession();
 }
 
