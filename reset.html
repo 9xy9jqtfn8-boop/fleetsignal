@@ -41,30 +41,56 @@
   </div>
 
   <script>
-    const SUPABASE_URL = "https://bufhopdljmpaerrvigay.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_syvITTAJPgDewBp19skDkQ_TGnU6u7d";
+   
+  const SUPABASE_URL = "https://bufhopdljmpaerrvigay.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_syvITTAJPgDewBp19skDkQ_TGnU6u7d";
 
-    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    async function updatePassword() {
-      const newPassword = document.getElementById("newPassword").value;
-      const resetMessage = document.getElementById("resetMessage");
+  const resetMessage = document.getElementById("resetMessage");
 
-      if (!newPassword) {
-        resetMessage.innerText = "Enter a new password.";
-        return;
-      }
+  // ==========================
+  // HANDLE RECOVERY SESSION
+  // ==========================
+  document.addEventListener("DOMContentLoaded", async () => {
+    const hash = window.location.hash;
 
-      const { error } = await client.auth.updateUser({
-        password: newPassword
-      });
-
-      if (error) {
-        resetMessage.innerText = error.message;
-      } else {
-        resetMessage.innerText = "Password updated. You can now log in.";
-      }
+    if (!hash || !hash.includes("access_token")) {
+      resetMessage.innerText = "Invalid or expired reset link.";
+      return;
     }
+
+    console.log("🔐 Recovery link detected");
+  });
+
+  // ==========================
+  // UPDATE PASSWORD
+  // ==========================
+  async function updatePassword() {
+    const newPassword = document.getElementById("newPassword").value;
+
+    if (!newPassword) {
+      resetMessage.innerText = "Enter a new password.";
+      return;
+    }
+
+    const { error } = await client.auth.updateUser({
+      password: newPassword
+    });
+
+    if (error) {
+      console.error("Password update error:", error);
+      resetMessage.innerText = error.message;
+    } else {
+      resetMessage.innerText = "✅ Password updated. You can now log in.";
+
+      // OPTIONAL: redirect after success
+      setTimeout(() => {
+        window.location.href = "/app.html";
+      }, 2000);
+    }
+  }
+</script>
   </script>
 
   <script>

@@ -1,7 +1,7 @@
 {
   "routes": [
     { "src": "^/api/(.*)", "dest": "/api/$1" },
-    { "src": "/", "dest": "/app.html" }
+    { "src": "/", "dest": "/index.html" }
   ],
   "crons": [
     {

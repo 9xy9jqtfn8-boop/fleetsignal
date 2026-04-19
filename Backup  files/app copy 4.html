@@ -19,10 +19,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 </head>
-
 <body>
 
-  <!-- TOP BAR -->
+  <!-- =========================
+       TOP BAR
+  ========================== -->
   <div class="top-bar">
     <div class="top-left">
       <span class="logo-mark">🚗</span>
@@ -32,16 +33,15 @@
     <div class="top-right">
       <span id="headerUserEmail" class="header-user-email"></span>
       <span id="headerPlanBadge" class="badge free"></span>
-      <button id="logoutBtn" class="logout-btn" type="button" style="display:none;">
-        Logout
-      </button>
+      <button id="logoutBtn" class="logout-btn" type="button">Logout</button>
     </div>
   </div>
 
-  <!-- LOGIN -->
+  <!-- =========================
+       LOGIN
+  ========================== -->
   <div id="authBox" class="container">
     <div class="card auth-card">
-
       <div class="auth-hero">
         <div class="auth-kicker">Vehicle compliance made simple</div>
         <h2>Login</h2>
@@ -50,8 +50,8 @@
         </p>
       </div>
 
-      <input id="email" type="email" placeholder="Email" />
-      <input id="password" type="password" placeholder="Password" />
+      <input id="email" type="email" placeholder="Email" autocomplete="email" />
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
 
       <button id="loginBtn" class="primary-btn" type="button">Login</button>
       <button id="signupBtn" class="secondary-btn" type="button">Sign Up</button>
@@ -61,23 +61,26 @@
       </p>
 
       <p id="authMessage" class="message"></p>
-
     </div>
   </div>
 
-  <!-- DASHBOARD -->
+  <!-- =========================
+       DASHBOARD
+  ========================== -->
   <div id="dashboardBox" class="container hidden">
 
+    <!-- =========================
+         MAIN DASHBOARD CARD
+    ========================== -->
     <div class="card dashboard-card">
-
       <div class="dashboard-title-wrap">
         <h1>🚗 Fleet Dashboard</h1>
-        <p class="dashboard-subtext">
-          Track vehicle compliance with a clean, simple view.
-        </p>
+        <p class="dashboard-subtext">Track vehicle compliance with a clean, simple view.</p>
       </div>
 
-      <!-- USER BAR -->
+      <!-- =========================
+           USER BAR
+      ========================== -->
       <div class="user-bar">
         <div class="user-bar-left">
           <div class="user-bar-label">Signed in as</div>
@@ -89,18 +92,12 @@
         </div>
       </div>
 
-      <!-- FORM -->
+      <!-- =========================
+           VEHICLE CHECK FORM
+      ========================== -->
       <div class="form-section">
-
-        <!-- ✅ ONLY ONE REG INPUT -->
-        <input 
-          id="regInput" 
-          type="text" 
-          placeholder="Registration" 
-          style="text-transform: uppercase;" 
-        />
-
-        <input id="alertEmailInput" type="email" placeholder="Email for MOT alerts" />
+        <input id="regInput" type="text" placeholder="Registration" autocapitalize="characters" spellcheck="false" />
+        <input id="alertEmailInput" type="email" placeholder="Email for MOT alerts" autocomplete="email" />
 
         <div class="alert-toggle-row">
           <label class="switch">
@@ -110,9 +107,7 @@
           <span id="alertsLabel">Alerts OFF</span>
         </div>
 
-        <button id="checkBtn" class="primary-btn" type="button">
-          Check Vehicle
-        </button>
+        <button id="checkBtn" class="primary-btn" type="button">Check Vehicle</button>
 
         <div class="vehicle-meta-grid">
           <input id="vehicleNameInput" type="text" placeholder="Vehicle name (optional)" />
@@ -120,32 +115,31 @@
           <input id="vehicleColourInput" type="text" placeholder="Colour" />
           <input id="insuranceInput" type="text" placeholder="Insurance Expiry (YYYY-MM-DD)" />
         </div>
-
       </div>
 
-      <!-- RESULT -->
+      <!-- =========================
+           RESULT BOX
+      ========================== -->
       <div id="resultBox" class="result-box"></div>
 
-      <!-- UPGRADE -->
+      <!-- =========================
+           UPGRADE BOX
+      ========================== -->
       <div class="upgrade-box">
         <div class="upgrade-eyebrow">Premium</div>
         <p><strong>Never miss an MOT again</strong></p>
-
         <div class="upgrade-copy">
           Get reminder support and a more complete compliance workflow.
         </div>
-
-        <a
-          href="https://buy.stripe.com/test_aFadRa61O4lidDw7J20Jq04?success_url=https://www.getfleetsignal.com/app.html?success=true&cancel_url=https://www.getfleetsignal.com/app.html"
-          class="upgrade-btn"
-        >
+        <a href="https://buy.stripe.com/test_aFadRa61O4lidDw7J20Jq04" class="upgrade-btn">
           Upgrade to Premium
         </a>
       </div>
-
     </div>
 
-    <!-- VEHICLE LIST -->
+    <!-- =========================
+         VEHICLE LIST
+    ========================== -->
     <div class="card vehicle-list-card">
       <div class="section-head">
         <h3>Your Vehicles</h3>
@@ -157,8 +151,6 @@
 
   </div>
 
-  <!-- JS -->
   <script src="app.js"></script>
-
 </body>
 </html>

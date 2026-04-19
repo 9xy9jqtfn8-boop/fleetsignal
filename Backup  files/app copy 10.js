@@ -1,17 +1,21 @@
 // =======================
-// STEP 1: SETUP
+// SUPABASE SETUP
 // =======================
-const SUPABASE_URL = "https://bufhopdljmpaerrvigay.supabase.co";
-const SUPABASE_KEY = "sb_publishable_syvITTAJPgDewBp19skDkQ_TGnU6u7d";
+const SUPABASE_URL =
+  "https://bufhopdljmpaerrvigay.supabase.co";
+const SUPABASE_KEY =
+  "sb_publishable_syvITTAJPgDewBp19skDkQ_TGnU6u7d";
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ==========================
+// UI ELEMENTS
+// ==========================
 const authBox = document.getElementById("authBox");
 const dashboardBox = document.getElementById("dashboardBox");
 const authMessage = document.getElementById("authMessage");
 
-let currentSession = null;
-let premiumCache = null;
 let isLoadingVehicles = false;
+let currentSession = null;
 
 // ==========================
 // HELPERS
@@ -41,41 +45,13 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function clearDashboardInputs() {
-  const ids = [
-    "regInput",
-    "alertEmailInput",
-    "vehicleNameInput",
-    "vehicleTypeInput",
-    "vehicleColourInput",
-    "insuranceInput",
-  ];
-
-  ids.forEach((id) => {
-    const el = getEl(id);
-    if (el) el.value = "";
-  });
-}
-
-function clearLoginInputs() {
-  const email = getEl("email");
-  const password = getEl("password");
-
-  if (email) email.value = "";
-  if (password) password.value = "";
-}
-
 function normaliseVehicleType(type) {
   if (!type) return "Car";
-
   const t = String(type).trim().toLowerCase();
-
   if (t.includes("van")) return "Van";
   if (t.includes("motor")) return "Motorcycle";
   if (t.includes("bike")) return "Motorcycle";
   if (t.includes("truck")) return "Truck";
-  if (t.includes("lorry")) return "Lorry";
-
   return "Car";
 }
 
@@ -84,7 +60,6 @@ function getVehicleIcon(type, make) {
   const m = String(make || "").toLowerCase();
 
   if (t.includes("motorcycle") || t.includes("bike")) return "🏍️";
-
   if (
     t.includes("van") ||
     m.includes("transit") ||
@@ -97,9 +72,7 @@ function getVehicleIcon(type, make) {
   ) {
     return "🚐";
   }
-
   if (t.includes("truck") || t.includes("lorry")) return "🚛";
-
   return "🚗";
 }
 
@@ -107,40 +80,24 @@ function getVehicleIcon(type, make) {
 // PREMIUM STATUS
 // ==========================
 async function getPremiumStatus(sessionOverride = null) {
-  if (premiumCache !== null) return premiumCache;
-
   const session = sessionOverride ?? currentSession;
 
-  if (!session?.user) {
-    premiumCache = false;
+  if (!session?.user) return false;
+
+  const { data, error } = await client
+    .from("profiles")
+    .select("is_premium")
+    .eq("id", session.user.id)
+    .single();
+
+  if (error) {
+    console.log("Premium fetch error:", error);
     return false;
   }
 
-  try {
-    const { data, error } = await client
-      .from("profiles")
-      .select("is_premium")
-      .eq("id", session.user.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Premium check error:", error);
-      premiumCache = false;
-      return false;
-    }
-
-    premiumCache = Boolean(data?.is_premium);
-    return premiumCache;
-  } catch (err) {
-    console.error("Premium check crashed:", err);
-    premiumCache = false;
-    return false;
-  }
+  return data?.is_premium === true;
 }
 
-// ==========================
-// UPDATE USER UI (SAFE + CLEAN)
-// ==========================
 async function updateUserStatusUI(sessionOverride = null) {
   const session = sessionOverride ?? currentSession;
 
@@ -150,7 +107,6 @@ async function updateUserStatusUI(sessionOverride = null) {
   const dashboardBadge = getEl("dashboardPlanBadge");
   const logoutBtn = getEl("logoutBtn");
 
-  // NOT LOGGED IN
   if (!session?.user) {
     if (headerEmail) headerEmail.innerText = "";
     if (dashboardEmail) dashboardEmail.innerText = "";
@@ -169,15 +125,7 @@ async function updateUserStatusUI(sessionOverride = null) {
     return;
   }
 
-  // LOGGED IN
-  let isPremium = false;
-
-  try {
-    isPremium = await getPremiumStatus(session);
-  } catch (err) {
-    console.error("Premium check failed:", err);
-  }
-
+  const isPremium = await getPremiumStatus(session);
   const planText = isPremium ? "Premium" : "Free";
   const badgeClass = isPremium ? "badge premium" : "badge free";
 
@@ -197,154 +145,47 @@ async function updateUserStatusUI(sessionOverride = null) {
   if (logoutBtn) logoutBtn.style.display = "inline-flex";
 }
 
-// ==========================
-// PREMIUM UI CONTROL (NON-BLOCKING FIX)
-// ==========================
 async function checkPremiumUI(sessionOverride = null) {
   const upgradeBox = document.querySelector(".upgrade-box");
-  const toggle = getEl("alertsToggle");
-  const label = getEl("alertsLabel");
-  const alertEmailInput = getEl("alertEmailInput");
-
   if (!upgradeBox) return;
 
   const session = sessionOverride ?? currentSession;
 
-  // DEFAULT SAFE STATE (prevents UI lock)
-  let isPremium = false;
-
-  try {
-    if (session?.user) {
-      isPremium = await getPremiumStatus(session);
-    }
-  } catch (err) {
-    console.error("Premium UI check failed:", err);
-  }
-
-  // NOT LOGGED IN
   if (!session?.user) {
     upgradeBox.style.display = "block";
-
-    if (toggle) {
-      toggle.checked = false;
-      toggle.disabled = true;
-    }
-
-    if (label) label.textContent = "Premium only";
-
-    if (alertEmailInput) {
-      alertEmailInput.disabled = true;
-      alertEmailInput.style.opacity = "0.55";
-    }
-
     return;
   }
 
-  // PREMIUM / FREE LOGIC
+  const isPremium = await getPremiumStatus(session);
   upgradeBox.style.display = isPremium ? "none" : "block";
-
-  if (!isPremium) {
-    if (toggle) {
-      toggle.checked = false;
-      toggle.disabled = true;
-    }
-
-    if (label) label.textContent = "Premium only";
-
-    if (alertEmailInput) {
-      alertEmailInput.disabled = true;
-      alertEmailInput.style.opacity = "0.55";
-    }
-
-    return;
-  }
-
-  // PREMIUM USER (fully interactive)
-  if (toggle) toggle.disabled = false;
-
-  if (label) {
-    label.textContent = toggle?.checked ? "Alerts ON" : "Alerts OFF";
-  }
-
-  if (alertEmailInput) {
-    const enabled = Boolean(toggle?.checked);
-    alertEmailInput.disabled = !enabled;
-    alertEmailInput.style.opacity = enabled ? "1" : "0.55";
-  }
 }
 
 // ==========================
 // STRIPE SUCCESS
 // ==========================
-function handleStripeSuccess() {
+async function handleStripeSuccess() {
   const params = new URLSearchParams(window.location.search);
-  const success = params.get("success");
+  if (params.get("success") !== "true") return;
 
-  if (success !== "true") return;
-
-  console.log("💳 Stripe success detected");
-
-  localStorage.setItem("stripe_pending", "true");
-
-  // ✅ Delay URL cleanup until AFTER app loads
-  setTimeout(() => {
-    window.history.replaceState({}, document.title, "/app.html");
-  }, 1500);
-}
-
-// ==========================
-// APPLY PREMIUM
-// ==========================
-async function applyPendingPremium(sessionOverride = null) {
-  const pending = localStorage.getItem("stripe_pending");
-  if (pending !== "true") return;
-
-  const session = sessionOverride ?? currentSession;
-  const user = session?.user;
-
+  const { data: { user } } = await client.auth.getUser();
   if (!user) return;
 
-  try {
-    const { data: existingProfile, error: existingError } = await client
-      .from("profiles")
-      .select("is_premium")
-      .eq("id", user.id)
-      .maybeSingle();
+  const { error } = await client
+    .from("profiles")
+    .update({ is_premium: true })
+    .eq("id", user.id);
 
-    if (existingError) {
-      console.error("Premium profile read failed:", existingError);
-      localStorage.removeItem("stripe_pending");
-      return;
-    }
-
-    if (existingProfile?.is_premium === true) {
-      premiumCache = true;
-      localStorage.removeItem("stripe_pending");
-      return;
-    }
-
-    const { error } = await client
-      .from("profiles")
-      .update({ is_premium: true })
-      .eq("id", user.id);
-
-    if (error) {
-      console.error("Premium update failed:", error);
-      localStorage.removeItem("stripe_pending");
-      return;
-    }
-
-    premiumCache = true;
-    localStorage.removeItem("stripe_pending");
-    alert("🎉 Payment successful! Premium activated.");
-  } catch (err) {
-    console.error("Pending premium failed:", err);
-    localStorage.removeItem("stripe_pending");
+  if (error) {
+    console.log("Stripe premium save error:", error);
+    return;
   }
+
+  alert("🎉 Payment successful! Premium activated.");
+  window.history.replaceState({}, document.title, "/app.html");
 }
 
 // ==========================
-// ALERT CONTROLS
+// ALERT TOGGLE UI
 // ==========================
 function initAlertControls() {
   const toggle = getEl("alertsToggle");
@@ -356,17 +197,15 @@ function initAlertControls() {
   const savedToggle = localStorage.getItem("fleet_alert_toggle");
   const savedEmail = localStorage.getItem("fleet_alert_email");
 
-  if (savedToggle === "true") toggle.checked = true;
-  if (savedEmail) emailInput.value = savedEmail;
+  if (savedToggle === "true") {
+    toggle.checked = true;
+  }
+
+  if (savedEmail) {
+    emailInput.value = savedEmail;
+  }
 
   function updateAlertUI() {
-    if (toggle.disabled) {
-      label.textContent = "Premium only";
-      emailInput.disabled = true;
-      emailInput.style.opacity = "0.55";
-      return;
-    }
-
     if (toggle.checked) {
       label.textContent = "Alerts ON";
       emailInput.disabled = false;
@@ -391,78 +230,44 @@ function initAlertControls() {
 }
 
 // ==========================
-// UI VIEW CONTROL
+// INIT
 // ==========================
-function showLogin() {
-  console.log("🔐 Showing login");
+document.addEventListener("DOMContentLoaded", async () => {
+  setupAuthButtons();
+  initAlertControls();
+  await handleStripeSuccess();
 
-  if (authBox) {
-    authBox.classList.remove("hidden");
-    authBox.style.display = "block";
-  }
+  showLogin();
 
-  if (dashboardBox) {
-    dashboardBox.classList.add("hidden");
-    dashboardBox.style.display = "none";
-  }
+  const { data: { session } } = await client.auth.getSession();
+  currentSession = session ?? null;
 
-  setAuthMessage("");
-  setResultMessage("");
-
-  const list = getEl("vehicleList");
-  if (list) list.innerHTML = "";
-
-  clearDashboardInputs();
-}
-
-async function showDashboard(sessionOverride = null) {
-  const session = sessionOverride ?? currentSession;
-
-  if (!session?.user) {
-    showLogin();
-    return;
-  }
-
-  console.log("📊 Rendering dashboard");
-
-  if (authBox) {
-    authBox.classList.add("hidden");
-    authBox.style.display = "none";
-  }
-
-  if (dashboardBox) {
-    dashboardBox.classList.remove("hidden");
-    dashboardBox.style.display = "block";
-  }
-
-  clearLoginInputs();
-  setResultMessage("");
-
-  await updateUserStatusUI(session);
-  await checkPremiumUI(session);
-  await loadVehicles();
-
-  setTimeout(() => {
-    getEl("regInput")?.focus();
-  }, 150);
-}
-
-async function renderAppForSession(sessionOverride = null) {
-  const session = sessionOverride ?? currentSession;
-
-  if (session?.user) {
-    console.log("✅ Rendering dashboard");
-
-    await applyPendingPremium(session);
-    await showDashboard(session);
+  if (currentSession?.user) {
+    console.log("✅ Existing session:", currentSession.user.email);
+    await showDashboard(currentSession);
   } else {
-    console.log("🔐 Rendering login");
-
+    console.log("🚪 No session on load");
     showLogin();
     await updateUserStatusUI(null);
     await checkPremiumUI(null);
   }
-}
+
+  client.auth.onAuthStateChange(async (event, session) => {
+    console.log("🔄 Auth state changed:", event);
+
+    currentSession = session ?? null;
+
+    if (currentSession?.user) {
+      console.log("✅ Fresh session user:", currentSession.user.email);
+      await showDashboard(currentSession);
+    } else {
+      console.log("🚪 No session → showing login");
+      showLogin();
+      await updateUserStatusUI(null);
+      await checkPremiumUI(null);
+    }
+  });
+});
 
 // ==========================
 // AUTH BUTTONS
@@ -506,6 +311,8 @@ async function signup() {
 }
 
 async function login() {
+  console.log("🔐 Login clicked");
+
   try {
     const email = getEl("email")?.value.trim();
     const password = getEl("password")?.value ?? "";
@@ -523,11 +330,12 @@ async function login() {
     });
 
     if (error) {
-      console.error("Login error:", error);
+      console.log("❌ Login error:", error);
       setAuthMessage(error.message);
       return;
     }
 
+    console.log("✅ Login request accepted");
     setAuthMessage("");
   } catch (err) {
     console.error("Login failed:", err);
@@ -536,6 +344,8 @@ async function login() {
 }
 
 async function logout() {
+  console.log("🚪 Logging out...");
+
   try {
     await client.auth.signOut();
   } catch (err) {
@@ -543,8 +353,6 @@ async function logout() {
   }
 
   currentSession = null;
-  premiumCache = null;
-
   showLogin();
   await updateUserStatusUI(null);
   await checkPremiumUI(null);
@@ -569,6 +377,73 @@ async function forgotPasswordHandler(event) {
   } else {
     alert("Password reset email sent");
   }
+}
+
+// ==========================
+// SESSION
+// ==========================
+function showLogin() {
+  console.log("🔐 Showing login");
+
+  authBox?.classList.remove("hidden");
+  dashboardBox?.classList.add("hidden");
+
+  setAuthMessage("");
+  setResultMessage("");
+
+  const list = getEl("vehicleList");
+  if (list) list.innerHTML = "";
+
+  const email = getEl("email");
+  const password = getEl("password");
+  const regInput = getEl("regInput");
+  const alertEmail = getEl("alertEmailInput");
+  const vehicleName = getEl("vehicleNameInput");
+  const vehicleType = getEl("vehicleTypeInput");
+  const vehicleColour = getEl("vehicleColourInput");
+  const insurance = getEl("insuranceInput");
+
+  if (email) email.value = "";
+  if (password) password.value = "";
+  if (regInput) regInput.value = "";
+  if (alertEmail) alertEmail.value = "";
+  if (vehicleName) vehicleName.value = "";
+  if (vehicleType) vehicleType.value = "";
+  if (vehicleColour) vehicleColour.value = "";
+  if (insurance) insurance.value = "";
+}
+
+async function showDashboard(sessionOverride = null) {
+  const session = sessionOverride ?? currentSession;
+
+  console.log("🚗 Showing dashboard");
+
+  authBox?.classList.add("hidden");
+  dashboardBox?.classList.remove("hidden");
+
+  const regInput = getEl("regInput");
+  const alertEmail = getEl("alertEmailInput");
+  const vehicleName = getEl("vehicleNameInput");
+  const vehicleType = getEl("vehicleTypeInput");
+  const vehicleColour = getEl("vehicleColourInput");
+  const insurance = getEl("insuranceInput");
+
+  if (regInput) regInput.value = "";
+  if (alertEmail) alertEmail.value = "";
+  if (vehicleName) vehicleName.value = "";
+  if (vehicleType) vehicleType.value = "";
+  if (vehicleColour) vehicleColour.value = "";
+  if (insurance) insurance.value = "";
+
+  setResultMessage("");
+
+  await updateUserStatusUI(session);
+  await checkPremiumUI(session);
+  await loadVehicles();
+
+  setTimeout(() => {
+    getEl("regInput")?.focus();
+  }, 150);
 }
 
 // ==========================
@@ -602,10 +477,8 @@ async function sendReminderIfNeeded({ reg, motDays, alertEmail }) {
 
 // ==========================
 // VEHICLE CHECK
-// =========================
+// ==========================
 async function checkVehicle() {
-  console.log("🔥 BUTTON CLICKED");
-
   const regInput = getEl("regInput");
   const resultBox = getEl("resultBox");
   const vehicleNameInput = getEl("vehicleNameInput");
@@ -615,19 +488,15 @@ async function checkVehicle() {
   const alertEmailInput = getEl("alertEmailInput");
   const alertsToggle = getEl("alertsToggle");
 
-  console.log("regInput:", regInput);
-  console.log("resultBox:", resultBox);
-
-  if (!regInput || !resultBox) {
-    console.warn("Missing regInput or resultBox");
-    return;
-  }
+  if (!regInput || !resultBox) return;
 
   const reg = regInput.value.trim().toUpperCase();
   const manualName = vehicleNameInput?.value.trim() || "";
   const manualType = vehicleTypeInput?.value.trim() || "";
   const manualColour = vehicleColourInput?.value.trim() || "";
   const insuranceExpiry = insuranceInput?.value.trim() || null;
+  const alertsEnabled = alertsToggle?.checked;
+  const alertEmail = alertsEnabled ? (alertEmailInput?.value.trim() || "") : "";
 
   if (!reg) {
     setResultMessage("⚠️ Enter a registration");
@@ -635,18 +504,6 @@ async function checkVehicle() {
   }
 
   setResultMessage("⏳ Checking vehicle...");
-  console.log("🚀 Continuing vehicle check...", reg);
-
-  let isPremium = false;
-  try {
-    isPremium = await getPremiumStatus(currentSession);
-  } catch (err) {
-    console.warn("Premium check failed — continuing anyway:", err);
-    isPremium = false;
-  }
-
-  const alertsEnabled = isPremium ? Boolean(alertsToggle?.checked) : false;
-  const alertEmail = alertsEnabled ? (alertEmailInput?.value.trim() || "") : "";
 
   let motStatus = "Valid";
   let taxStatus = "Unknown";
@@ -656,22 +513,21 @@ async function checkVehicle() {
   let taxClass = "";
 
   try {
-    const apiUrl = `${window.location.origin}/api/mot?reg=${encodeURIComponent(reg)}`;
-    console.log("📡 Fetching:", apiUrl);
-
-    const response = await fetch(apiUrl, { cache: "no-store" });
-    const data = await response.json();
-
-    console.log("📦 MOT API response:", data);
+    const response = await fetch(
+      `${window.location.origin}/api/mot?reg=${encodeURIComponent(reg)}`
+    );
 
     if (!response.ok) {
-      throw new Error(data?.error || "Vehicle check request failed");
+      throw new Error("Vehicle check request failed");
     }
+
+    const data = await response.json();
 
     vehicleMake = data.make || "";
     vehicleColor = data.colour || "";
     taxClass = data.taxClass || "";
 
+    // MOT CALC
     if (data.motExpiryDate) {
       const expiry = new Date(data.motExpiryDate);
       const today = new Date();
@@ -682,7 +538,7 @@ async function checkVehicle() {
       else if (motDays < 30) motStatus = "Due soon";
       else motStatus = "Valid";
     } else {
-      motStatus = data.motStatus || "Unknown";
+      motStatus = "Unknown";
       motDays = null;
     }
 
@@ -690,95 +546,90 @@ async function checkVehicle() {
       data.taxStatus === "Taxed"
         ? "Taxed"
         : data.taxStatus === "SORN"
-          ? "SORN"
-          : data.taxStatus || "Untaxed";
+        ? "SORN"
+        : "Untaxed";
+
   } catch (err) {
     console.error("Vehicle check failed:", err);
-    setResultMessage(`❌ ${escapeHtml(err.message || "Vehicle lookup failed")}`);
-    return;
+    motStatus = "Error";
+    taxStatus = "Failed";
+    motDays = null;
   }
 
   const finalName = manualName || vehicleMake || "Vehicle";
   const finalColour = manualColour || vehicleColor || "";
 
+  // ==========================
+  // VEHICLE TYPE (FINAL LOGIC)
+  // ==========================
   let finalType = "Car";
-  const taxClassLower = String(taxClass || "").toLowerCase();
+
+  const taxClassLower = taxClass.toLowerCase();
 
   if (taxClassLower.includes("hgv")) {
     finalType = "Lorry";
   } else if (taxClassLower.includes("goods")) {
     finalType = "Van";
   } else {
-    const makeLower = String(vehicleMake || "").toLowerCase();
+    const makeLower = vehicleMake.toLowerCase();
 
-    const bikeBrands = [
-      "honda", "yamaha", "kawasaki", "ducati", "triumph", "ktm", "bsa", "suzuki"
-    ];
-    const vanKeywords = [
-      "transit", "sprinter", "vivaro", "trafic", "crafter", "ducato"
-    ];
+    const bikeBrands = ["honda", "yamaha", "kawasaki", "ducati", "triumph", "ktm", "bsa", "suzuki"];
+    if (bikeBrands.some(b => makeLower.includes(b))) {
+      finalType = "Motorcycle";
+    }
+
+    const vanKeywords = ["transit", "sprinter", "vivaro", "trafic", "crafter", "ducato"];
+    if (vanKeywords.some(v => makeLower.includes(v))) {
+      finalType = "Van";
+    }
+
     const lorryBrands = ["daf", "scania", "volvo", "man", "iveco"];
-
-    if (bikeBrands.some((b) => makeLower.includes(b))) finalType = "Motorcycle";
-    if (vanKeywords.some((v) => makeLower.includes(v))) finalType = "Van";
-    if (lorryBrands.some((l) => makeLower.includes(l))) finalType = "Lorry";
+    if (lorryBrands.some(l => makeLower.includes(l))) {
+      finalType = "Lorry";
+    }
   }
 
+  // MANUAL OVERRIDE
   if (manualType) {
-    finalType = normaliseVehicleType(manualType);
+    finalType = manualType;
   }
 
+  function getVehicleIcon(type) {
+    const t = (type || "").toLowerCase();
+    if (t.includes("motorcycle")) return "🏍️";
+    if (t.includes("van")) return "🚐";
+    if (t.includes("lorry")) return "🚛";
+    return "🚗";
+  }
+
+  // RESULT DISPLAY
   setResultMessage(`
     <div class="result-card">
       <div class="reg">${escapeHtml(reg)}</div>
-      <div class="meta">${escapeHtml(finalName)} ${escapeHtml(finalColour)}</div>
+      <div class="meta">${escapeHtml(vehicleMake)} ${escapeHtml(finalColour)}</div>
       <div class="status-row" style="margin-top:10px;">
-        <div class="status-pill ${
-          motStatus === "Valid"
-            ? "status-green"
-            : motStatus === "Due soon"
-              ? "status-yellow"
-              : "status-red"
-        }">
+        <div class="status-pill ${motStatus === "Valid" ? "status-green" : motStatus === "Due soon" ? "status-yellow" : "status-red"}">
           <span class="status-dot"></span>
           <span class="status-text">MOT</span>
-          <span class="status-value">${escapeHtml(motStatus)} (${motDays ?? "-"}d)</span>
+          <span class="status-value">${motStatus} (${motDays ?? "-"}d)</span>
         </div>
-        <div class="status-pill ${
-          taxStatus === "Taxed"
-            ? "status-green"
-            : taxStatus === "SORN"
-              ? "status-grey"
-              : "status-red"
-        }">
+        <div class="status-pill ${taxStatus === "Taxed" ? "status-green" : taxStatus === "SORN" ? "status-grey" : "status-red"}">
           <span class="status-dot"></span>
           <span class="status-text">TAX</span>
-          <span class="status-value">${escapeHtml(taxStatus)}</span>
+          <span class="status-value">${taxStatus}</span>
         </div>
       </div>
     </div>
   `);
 
   try {
-    const {
-      data: { user },
-      error: userError,
-    } = await client.auth.getUser();
-
-    if (userError) {
-      console.error("User fetch failed:", userError);
-      return;
-    }
-
-    if (!user) {
-      console.warn("No authenticated user found while saving vehicle");
-      return;
-    }
+    const { data: authData } = await client.auth.getUser();
+    const user = authData?.user;
+    if (!user) return;
 
     const payload = {
       user_id: user.id,
       reg,
-      name: finalName,
       mot_status: motStatus,
       mot_days: motDays,
       tax_status: taxStatus,
@@ -800,70 +651,52 @@ async function checkVehicle() {
       .limit(1);
 
     if (existingError) {
-      console.error("Existing vehicle lookup failed:", existingError);
+      console.error(existingError);
       return;
     }
 
     if (existing && existing.length > 0) {
-      const { error: updateError } = await client
-        .from("vehicles")
-        .update(payload)
-        .eq("id", existing[0].id);
-
-      if (updateError) {
-        console.error("Vehicle update failed:", updateError);
-        return;
-      }
-
+      await client.from("vehicles").update(payload).eq("id", existing[0].id);
       vehicleId = existing[0].id;
       lastAlertSent = existing[0].last_alert_sent;
     } else {
-      const { data: inserted, error: insertError } = await client
+      const { data: inserted } = await client
         .from("vehicles")
         .insert([payload])
         .select();
 
-      if (insertError) {
-        console.error("Vehicle insert failed:", insertError);
-        return;
-      }
-
       vehicleId = inserted?.[0]?.id || null;
     }
 
-    if (isPremium && alertEmail && typeof motDays === "number" && motDays < 30) {
+    if (alertEmail && typeof motDays === "number" && motDays < 30) {
       const lastSent = lastAlertSent ? new Date(lastAlertSent) : null;
       const now = new Date();
-      const daysSince = lastSent
-        ? (now - lastSent) / (1000 * 60 * 60 * 24)
-        : null;
+      const daysSince = lastSent ? (now - lastSent) / (1000 * 60 * 60 * 24) : null;
 
       if (!lastSent || daysSince >= 7) {
         await sendReminderIfNeeded({ reg, motDays, alertEmail });
 
-        if (vehicleId) {
-          await client
-            .from("vehicles")
-            .update({ last_alert_sent: new Date().toISOString() })
-            .eq("id", vehicleId);
-        }
+        await client
+          .from("vehicles")
+          .update({ last_alert_sent: new Date().toISOString() })
+          .eq("id", vehicleId);
       }
     }
 
     setResultMessage("");
     await loadVehicles();
+
   } catch (err) {
     console.error("Save failed:", err);
   }
 }
 
 // ==========================
-// LOAD VEHICLES
+// LOAD VEHICLES (FIXED)
 // ==========================
 async function loadVehicles() {
-  if (isLoadingVehicles) return;
-
   try {
+    if (isLoadingVehicles) return;
     isLoadingVehicles = true;
 
     const list = getEl("vehicleList");
@@ -871,10 +704,8 @@ async function loadVehicles() {
 
     list.innerHTML = "";
 
-    const {
-      data: { user },
-    } = await client.auth.getUser();
-
+    const { data: authData } = await client.auth.getUser();
+    const user = authData?.user;
     if (!user) {
       list.innerHTML = "<p>No vehicles yet</p>";
       return;
@@ -913,10 +744,10 @@ async function loadVehicles() {
       if (v.mot_days !== null && v.mot_days < 30) motClass = "status-yellow";
       if (v.mot_days !== null && v.mot_days <= 0) motClass = "status-red";
 
-      let taxClassName = "status-grey";
-      if (v.tax_status === "Taxed") taxClassName = "status-green";
+      let taxClass = "status-grey";
+      if (v.tax_status === "Taxed") taxClass = "status-green";
       else if (v.tax_status === "Untaxed" || v.tax_status === "Failed") {
-        taxClassName = "status-red";
+        taxClass = "status-red";
       }
 
       let insClass = "status-grey";
@@ -958,6 +789,7 @@ async function loadVehicles() {
       row.innerHTML = `
         <div class="vehicle-top">
           <div class="vehicle-reg">${safeReg}</div>
+
           <div class="vehicle-right">
             <div class="vehicle-icon">${icon}</div>
             <button class="delete-btn" type="button">✖</button>
@@ -975,7 +807,7 @@ async function loadVehicles() {
             <span class="status-value">${safeMotStatus} (${safeMotDays}d)</span>
           </div>
 
-          <div class="status-pill ${taxClassName}">
+          <div class="status-pill ${taxClass}">
             <span class="status-dot"></span>
             <span class="status-text">TAX</span>
             <span class="status-value">${safeTaxStatus}</span>
@@ -991,11 +823,12 @@ async function loadVehicles() {
 
       list.appendChild(row);
 
+      // ✅ DELETE HANDLER (SAFE FOR SAFARI)
       const deleteBtn = row.querySelector(".delete-btn");
 
       if (deleteBtn) {
         deleteBtn.onclick = async () => {
-          const confirmed = confirm(`Delete ${v.reg}?`);
+          const confirmed = confirm("Delete " + v.reg + "?");
           if (!confirmed) return;
 
           const vehicleId = v?.id;
@@ -1018,7 +851,9 @@ async function loadVehicles() {
               return;
             }
 
+            console.log("Delete successful:", vehicleId);
             await loadVehicles();
+
           } catch (err) {
             console.error("Unexpected delete error:", err);
             alert("Unexpected error during delete");
@@ -1026,48 +861,8 @@ async function loadVehicles() {
         };
       }
     }
-  } catch (err) {
-    console.error("loadVehicles crashed:", err);
+
   } finally {
     isLoadingVehicles = false;
   }
 }
-
-// ==========================
-// CLEAN INIT + AUTH SYSTEM
-// ==========================
-async function initApp() {
-  console.log("🚀 Initialising App...");
-
-  setupAuthButtons();
-  initAlertControls();
-  await handleStripeSuccess();
-
-  const {
-    data: { session },
-  } = await client.auth.getSession();
-
-  currentSession = session ?? null;
-  premiumCache = null;
-
-  await renderAppForSession(currentSession);
-}
-
-client.auth.onAuthStateChange(async (event, session) => {
-  console.log("🔄 Auth change:", event);
-
-  currentSession = session ?? null;
-  premiumCache = null;
-
-  await renderAppForSession(currentSession);
-});
-
-// ==========================
-// START APP
-// ==========================
-document.addEventListener("DOMContentLoaded", () => {
-  initApp().catch((err) => {
-    console.error("❌ App init failed:", err);
-    showLogin();
-  });
-});
