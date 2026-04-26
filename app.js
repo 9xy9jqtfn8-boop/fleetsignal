@@ -34,14 +34,19 @@ function setResultMessage(html = "") {
 function showLogin() {
   const authBox = getEl("authBox");
   const dashboardBox = getEl("dashboardBox");
+  const logoutBtn = getEl("logoutBtn");
 
   if (authBox) authBox.classList.remove("hidden");
   if (dashboardBox) dashboardBox.classList.add("hidden");
+
+  // Hide logout on login screen
+  if (logoutBtn) logoutBtn.style.display = "none";
 }
 
 function showDashboard(session) {
   const authBox = getEl("authBox");
   const dashboardBox = getEl("dashboardBox");
+  const logoutBtn = getEl("logoutBtn");
 
   if (authBox) authBox.classList.add("hidden");
   if (dashboardBox) dashboardBox.classList.remove("hidden");
@@ -51,13 +56,15 @@ function showDashboard(session) {
 
   loadVehicles();
 
-   const logoutBtn = getEl("logoutBtn");
-if (logoutBtn) logoutBtn.style.display = "none";
+  // ✅ SHOW the logout button (this was your issue)
+  if (logoutBtn) logoutBtn.style.display = "inline-block";
 
-if (logoutBtn) {
-  console.log("Binding logout button");
-  logoutBtn.addEventListener("click", logout);
-}
+  // Prevent duplicate listeners
+  if (logoutBtn && !logoutBtn.dataset.bound) {
+    console.log("Binding logout button");
+    logoutBtn.addEventListener("click", logout);
+    logoutBtn.dataset.bound = "true";
+  }
 }
 
 // =======================
