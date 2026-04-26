@@ -32,29 +32,35 @@ function setResultMessage(html = "") {
 // UI CONTROL
 // =======================
 function showLogin() {
-  const authBox = getEl("authBox");
-  const dashboardBox = getEl("dashboardBox");
-  const logoutBtn = getEl("logoutBtn");
+ const authBox = getEl("authBox");
+ const dashboardBox = getEl("dashboardBox");
+ const logoutBtn = getEl("logoutBtn");
+ const headerEmail = getEl("headerUserEmail");
 
-  if (authBox) authBox.classList.remove("hidden");
-  if (dashboardBox) dashboardBox.classList.add("hidden");
+ if (authBox) authBox.classList.remove("hidden");
+ if (dashboardBox) dashboardBox.classList.add("hidden");
 
-  // Hide logout on login screen
-  if (logoutBtn) logoutBtn.style.display = "none";
+ if (logoutBtn) logoutBtn.style.display = "none";
+ if (headerEmail) headerEmail.innerText = "";
 }
 
 function showDashboard(session) {
-  const authBox = getEl("authBox");
-  const dashboardBox = getEl("dashboardBox");
-  const logoutBtn = getEl("logoutBtn");
+ const authBox = getEl("authBox");
+ const dashboardBox = getEl("dashboardBox");
+ const logoutBtn = getEl("logoutBtn");
+ const emailEl = getEl("dashboardUserEmail");
+ const headerEmail = getEl("headerUserEmail");
 
-  if (authBox) authBox.classList.add("hidden");
-  if (dashboardBox) dashboardBox.classList.remove("hidden");
+ if (authBox) authBox.classList.add("hidden");
+ if (dashboardBox) dashboardBox.classList.remove("hidden");
 
-  const emailEl = getEl("dashboardUserEmail");
-  if (emailEl) emailEl.innerText = session.user.email;
+ if (emailEl) emailEl.innerText = session.user.email;
+ if (headerEmail) headerEmail.innerText = session.user.email;
 
-  loadVehicles();
+ if (logoutBtn) logoutBtn.style.display = "inline-flex";
+
+ loadVehicles();
+}
 
   // ✅ SHOW the logout button (this was your issue)
   if (logoutBtn) logoutBtn.style.display = "inline-block";
@@ -65,7 +71,6 @@ function showDashboard(session) {
     logoutBtn.addEventListener("click", logout);
     logoutBtn.dataset.bound = "true";
   }
-}
 
 // =======================
 // AUTH
@@ -187,32 +192,88 @@ async function checkVehicle() {
 // LOAD VEHICLES (PREMIUM FINAL)
 // =======================
 async function loadVehicles() {
-  if (isLoadingVehicles) return;
+ if (isLoadingVehicles) return;
 
-  isLoadingVehicles = true;
+ isLoadingVehicles = true;
 
-  const list = getEl("vehicleList");
-  list.innerHTML = "";
+ const list = getEl("vehicleList");
+ if (!list) {
+   isLoadingVehicles = false;
+   return;
+ }
 
-  const { data: { user } } = await client.auth.getUser();
+ list.innerHTML = "";
 
-  if (!user) {
-    list.innerHTML = "<p>No vehicles</p>";
-    isLoadingVehicles = false;
-    return;
-  }
+ const { data: { user } } = await client.auth.getUser();
 
-  const { data, error } = await client
-    .from("vehicles")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+ if (!user) {
+   list.innerHTML = getEmptyVehicleState();
+   isLoadingVehicles = false;
+   return;
+ }
 
-  if (error || !data || !data.length) {
-    list.innerHTML = "<p>No vehicles</p>";
-    isLoadingVehicles = false;
-    return;
-  }
+ const { data, error } = await client
+   .from("vehicles")
+   .select("*")
+   .eq("user_id", user.id)
+   .order("created_at", { ascending: false });
+
+ if (error || !data || !data.length) {
+   list.innerHTML = getEmptyVehicleState();
+   isLoadingVehicles = false;
+   return;
+ }
+
+ data.forEach(v => {
+   const row = document.createElement("div");
+
+   const motClass = getMotClass(v.mot_status, v.mot_days);
+   const taxClass = getTaxClass(v.tax_status);
+   const icon = getVehicleIcon(v);
+   const makeColour = [v.make, v.colour].filter(Boolean).join(" • ");
+
+   row.className = `vehicle-card ${motClass}`;
+
+   row.innerHTML = `
+     <div class="vehicle-top">
+       <div class="vehicle-left">
+         <div class="vehicle-icon">${icon}</div>
+
+         <div>
+           <div class="vehicle-reg">${v.reg || "UNKNOWN"}</div>
+           <div class="vehicle-meta">
+             ${makeColour || "Vehicle details saved"}
+             ${getMotCountdown(v.mot_days)}
+           </div>
+         </div>
+       </div>
+
+       <button class="delete-btn" type="button" aria-label="Delete vehicle">×</button>
+     </div>
+
+     <div class="vehicle-status">
+       <div class="status-pill ${motClass}">
+         <span class="dot"></span>
+         MOT: ${v.mot_status || "Unknown"}
+       </div>
+
+       <div class="status-pill ${taxClass}">
+         <span class="dot"></span>
+         TAX: ${v.tax_status || "Unknown"}
+       </div>
+     </div>
+   `;
+
+   row.querySelector(".delete-btn").onclick = async () => {
+     await client.from("vehicles").delete().eq("id", v.id);
+     loadVehicles();
+   };
+
+   list.appendChild(row);
+ });
+
+ isLoadingVehicles = false;
+}
 
   data.forEach(v => {
     const row = document.createElement("div");
@@ -267,7 +328,6 @@ async function loadVehicles() {
   });
 
   isLoadingVehicles = false;
-}
 
 // =======================
 // INIT
@@ -281,37 +341,30 @@ function setupButtons() {
 
  if (loginBtn) loginBtn.onclick = login;
  if (signupBtn) signupBtn.onclick = signup;
- if (logoutBtn) {
-  console.log("Logout button found");
-  logoutBtn.onclick = () => {
-    console.log("CLICK WORKED");
-    logout();
-  };
-}
-
  if (checkBtn) checkBtn.onclick = checkVehicle;
  if (forgotLink) forgotLink.onclick = forgotPasswordHandler;
+
+ if (logoutBtn && !logoutBtn.dataset.bound) {
+   logoutBtn.onclick = logout;
+   logoutBtn.dataset.bound = "true";
+ }
 }
 
 async function initApp() {
-  console.log("App starting...");
+ console.log("App starting...");
 
-  setupButtons();
+ setupButtons();
 
-  const { data, error } = await client.auth.getSession();
+ const { data, error } = await client.auth.getSession();
 
-  if (error || !data.session) {
-    console.log("No valid session");
-    currentSession = null;
-    showLogin();
-    return;
-  }
+ if (error || !data.session) {
+   currentSession = null;
+   showLogin();
+   return;
+ }
 
-  currentSession = data.session;
-
-  console.log("Valid session:", data.session.user.email);
-
-  showDashboard(data.session);
+ currentSession = data.session;
+ showDashboard(data.session);
 }
 
 // =======================
@@ -331,10 +384,6 @@ client.auth.onAuthStateChange((event, session) => {
   }
 });
 
-// =======================
-// START
-// =======================
-document.addEventListener("DOMContentLoaded", initApp);
 
 // =======================
 // START
@@ -344,78 +393,92 @@ document.addEventListener("DOMContentLoaded", initApp);
 // =======================
 // VEHICLE HELPERS (UPGRADED)
 // =======================
-
+// =======================
+// VEHICLE HELPERS
+// =======================
 function getMotClass(status, days) {
-  if (status === "Expired") return "red";
-  if (days === null || days === undefined) return "yellow";
-  if (days <= 7) return "red";
-  if (days <= 30) return "yellow";
-  return "green";
+ const s = (status || "").toLowerCase();
+
+ if (s.includes("expired")) return "red";
+ if (days === null || days === undefined || Number.isNaN(Number(days))) return "yellow";
+ if (Number(days) <= 7) return "red";
+ if (Number(days) <= 30) return "yellow";
+
+ return "green";
 }
 
 function getTaxClass(status) {
-  if (!status) return "yellow";
-  if (status === "Taxed") return "green";
-  if (status === "SORN") return "yellow";
-  return "red";
-}
+ const s = (status || "").toLowerCase();
 
-function getVehicleIcon(v) {
-  const make = (v.make || "").toLowerCase();
-  const type = (v.vehicle_type || "").toLowerCase();
+ if (s.includes("taxed")) return "green";
+ if (s.includes("sorn")) return "yellow";
+ if (s.includes("untaxed")) return "red";
 
-  // MOTORBIKES
-  const bikes = [
-    "honda","yamaha","kawasaki","ducati","ktm","suzuki","triumph","bmw motorrad"
-  ];
-
-  // VANS
-  const vans = [
-    "transit","sprinter","vivaro","trafic","crafter","ducato","boxer","relay","nv200","nv300","nv400"
-  ];
-
-  // HGV / LORRIES
-  const hgvs = [
-    "daf","scania","volvo","man","iveco","mercedes actros","renault trucks"
-  ];
-
-  // MOTORBIKE DETECT
-  if (bikes.some(b => make.includes(b)) || type.includes("motorcycle")) {
-    return "🏍️";
-  }
-
-  // VAN DETECT
-  if (vans.some(vn => make.includes(vn)) || type.includes("van")) {
-    return "🚐";
-  }
-
-  // HGV DETECT
-  if (hgvs.some(h => make.includes(h)) || type.includes("hgv") || type.includes("lorry")) {
-    return "🚛";
-  }
-
-  // DEFAULT CAR
-  return "🚗";
+ return "yellow";
 }
 
 function getMotCountdown(days) {
-  if (days === null || days === undefined) return "";
+ if (days === null || days === undefined || Number.isNaN(Number(days))) return "";
 
-  if (days < 0) {
-    return `<div class="mot-countdown" style="color:#ef4444;">Expired</div>`;
-  }
+ const n = Number(days);
 
-  if (days === 0) {
-    return `<div class="mot-countdown" style="color:#ef4444;">Expires today</div>`;
-  }
+ if (n < 0) return `<div class="mot-countdown" style="color:#ef4444;">Expired</div>`;
+ if (n === 0) return `<div class="mot-countdown" style="color:#ef4444;">Expires today</div>`;
+ if (n <= 7) return `<div class="mot-countdown" style="color:#ef4444;">${n} day${n === 1 ? "" : "s"} left</div>`;
+ if (n <= 30) return `<div class="mot-countdown" style="color:#f59e0b;">${n} days left</div>`;
 
-  if (days <= 7) {
-    return `<div class="mot-countdown" style="color:#ef4444;">${days} day${days === 1 ? "" : "s"} left</div>`;
-  }
+ return `<div class="mot-countdown">${n} days left</div>`;
+}
 
-  if (days <= 30) {
-    return `<div class="mot-countdown" style="color:#eab308;">${days} days left</div>`;
-  }
+function getEmptyVehicleState() {
+ return `
+   <div class="empty-state">
+     <div class="empty-state-icon">🚗</div>
+     <div>No vehicles yet</div>
+     <p>Add a registration above to start tracking your fleet.</p>
+   </div>
+ `;
+}
 
-  return `<div class="mot-countdown">${days} days left</div>`;
+function getVehicleIcon(v) {
+ const make = (v.make || "").toLowerCase();
+ const type = (v.vehicle_type || "").toLowerCase();
+ const name = (v.name || "").toLowerCase();
+
+ const text = `${make} ${type} ${name}`;
+
+ const motorcycles = [
+   "motorcycle", "motorbike", "bike", "scooter", "moped",
+   "honda", "yamaha", "kawasaki", "ducati", "ktm", "suzuki",
+   "triumph", "harley", "aprilia", "vespa", "piaggio", "royal enfield",
+   "bsa", "moto guzzi", "indian"
+ ];
+
+ const vans = [
+   "van", "panel van", "transit", "sprinter", "vivaro", "trafic",
+   "crafter", "ducato", "boxer", "relay", "partner", "berlingo",
+   "caddy", "kangoo", "nv200", "nv300", "nv400", "vito", "expert",
+   "dispatch", "proace", "doblo", "combo", "movano", "master"
+ ];
+
+ const hgvs = [
+   "hgv", "lorry", "truck", "rigid", "artic", "tractor unit",
+   "daf", "scania", "man", "iveco", "volvo trucks", "actros",
+   "atego", "axor", "renault trucks", "isuzu truck", "fuso"
+ ];
+
+ const cars = [
+   "car", "hatchback", "saloon", "estate", "suv", "mpv",
+   "ford", "vauxhall", "volkswagen", "vw", "audi", "bmw",
+   "mercedes", "toyota", "nissan", "hyundai", "kia", "peugeot",
+   "citroen", "renault", "skoda", "seat", "mazda", "tesla",
+   "jaguar", "land rover", "range rover", "mini", "fiat", "volvo"
+ ];
+
+ if (motorcycles.some(x => text.includes(x))) return "🏍️";
+ if (hgvs.some(x => text.includes(x))) return "🚛";
+ if (vans.some(x => text.includes(x))) return "🚐";
+ if (cars.some(x => text.includes(x))) return "🚗";
+
+ return "🚗";
 }

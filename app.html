@@ -7,167 +7,143 @@
 
   <link rel="stylesheet" href="style.css" />
 
-  <!-- SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#22c55e" />
+  <meta name="theme-color" content="#0f62fe" />
 
-  <!-- IOS -->
   <link rel="apple-touch-icon" href="icon-192.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 </head>
 
 <body>
-
   <div class="app-shell">
 
-  <div class="status-bar"></div>
-
-  <div class="app-header">
-    <div class="header-left">🚗 FleetSignal</div>
-
-    <div class="header-right">
-      <span id="headerUserEmail"></span>
-      <button id="logoutBtn" class="logout-btn">Logout</button>
-    </div>
-  </div>
-
-  <div class="app-content">
-  </div>
-
-  <!-- LOGIN -->
-  <div id="authBox" class="container">
-    <div class="card auth-card">
-
-      <div class="auth-hero">
-        <div class="auth-kicker">Vehicle compliance made simple</div>
-        <h2>Login</h2>
-        <p class="auth-subtext">
-          Check MOT and tax status, save vehicles, and manage reminders in one place.
-        </p>
+    <header class="app-header">
+      <div class="header-left">
+        <span class="logo-mark">🚗</span>
+        <span class="logo-text">FleetSignal</span>
       </div>
 
-      <input id="email" type="email" placeholder="Email" />
-      <input id="password" type="password" placeholder="Password" />
-
-      <button id="loginBtn" class="primary-btn" type="button">Login</button>
-      <button id="signupBtn" class="secondary-btn" type="button">Sign Up</button>
-
-      <p class="helper-text">
-        <a href="#" id="forgotPasswordLink">Forgot password?</a>
-      </p>
-
-      <p id="authMessage" class="message"></p>
-
-    </div>
-  </div>
-
-  <!-- DASHBOARD -->
-  <div id="dashboardBox" class="container hidden">
-
-    <div class="card dashboard-card">
-
-      <div class="dashboard-title-wrap">
-        <h1>🚗 Fleet Dashboard</h1>
-        <p class="dashboard-subtext">
-          Track vehicle compliance with a clean, simple view.
-        </p>
+      <div class="header-right">
+        <span id="headerUserEmail" class="header-user-email"></span>
+        <button id="logoutBtn" class="logout-btn" type="button">Logout</button>
       </div>
+    </header>
 
-      <!-- USER BAR -->
-      <div class="user-bar">
-        <div class="user-bar-left">
-          <div class="user-bar-label">Signed in as</div>
-          <div id="dashboardUserEmail" class="dashboard-user-email"></div>
+    <main class="app-content">
+
+      <!-- LOGIN -->
+      <section id="authBox" class="container">
+        <div class="card auth-card">
+          <div class="auth-hero">
+            <div class="auth-kicker">Vehicle compliance made simple</div>
+            <h2>Login</h2>
+            <p class="auth-subtext">
+              Check MOT and tax status, save vehicles, and manage reminders in one place.
+            </p>
+          </div>
+
+          <input id="email" type="email" placeholder="Email" />
+          <input id="password" type="password" placeholder="Password" />
+
+          <button id="loginBtn" class="primary-btn" type="button">Login</button>
+          <button id="signupBtn" class="secondary-btn" type="button">Sign Up</button>
+
+          <p class="helper-text">
+            <a href="#" id="forgotPasswordLink">Forgot password?</a>
+          </p>
+
+          <p id="authMessage" class="message"></p>
+        </div>
+      </section>
+
+      <!-- DASHBOARD -->
+      <section id="dashboardBox" class="container hidden">
+
+        <div class="dashboard-hero">
+          <div>
+            <h1>Fleet Dashboard</h1>
+            <p>Track MOT, tax and reminders in one clean view.</p>
+          </div>
+          <div class="hero-icon">🚗</div>
         </div>
 
-        <div class="user-bar-right">
-         <span id="dashboardPlanBadge" class="badge free"></span>
+        <div class="card dashboard-card">
+
+          <div class="user-bar">
+            <div class="user-bar-left">
+              <div class="user-bar-label">Signed in as</div>
+              <div id="dashboardUserEmail" class="dashboard-user-email"></div>
+            </div>
+
+            <div class="user-bar-right">
+              <span id="dashboardPlanBadge" class="badge free">Free</span>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <input id="regInput" type="text" placeholder="Registration" style="text-transform: uppercase;" />
+
+            <input id="alertEmailInput" type="email" placeholder="Email for MOT alerts" />
+
+            <div class="alert-toggle-row">
+              <label class="switch">
+                <input type="checkbox" id="alertsToggle" />
+                <span class="slider"></span>
+              </label>
+              <span id="alertsLabel">Alerts OFF</span>
+            </div>
+
+            <button id="checkBtn" class="primary-btn" type="button">Check Vehicle</button>
+
+            <div class="vehicle-meta-grid">
+              <input id="vehicleNameInput" type="text" placeholder="Vehicle name (optional)" />
+              <input id="vehicleTypeInput" type="text" placeholder="Type (Car / Van / etc)" />
+              <input id="vehicleColourInput" type="text" placeholder="Colour" />
+              <input id="insuranceInput" type="text" placeholder="Insurance Expiry (YYYY-MM-DD)" />
+            </div>
+          </div>
+
+          <div id="resultBox" class="result-box"></div>
+
+          <div class="upgrade-box">
+            <div class="upgrade-eyebrow">Premium</div>
+            <p><strong>Never miss an MOT again</strong></p>
+            <div class="upgrade-copy">
+              Get reminder support and a more complete compliance workflow.
+            </div>
+
+            <a
+              href="https://buy.stripe.com/test_aFadRa61O4lidDw7J20Jq04?success_url=https://www.getfleetsignal.com/app.html?success=true&cancel_url=https://www.getfleetsignal.com/app.html"
+              class="upgrade-btn"
+            >
+              Upgrade to Premium
+            </a>
+          </div>
         </div>
-      </div>
 
-      <!-- FORM -->
-      <div class="form-section">
+        <div class="card vehicle-list-card">
+          <div class="section-head">
+            <h3>Your Vehicles</h3>
+            <p class="section-subtext">Saved vehicles appear here.</p>
+          </div>
 
-        <!-- ✅ ONLY ONE REG INPUT -->
-        <input 
-          id="regInput" 
-          type="text" 
-          placeholder="Registration" 
-          style="text-transform: uppercase;" 
-        />
-
-        <input id="alertEmailInput" type="email" placeholder="Email for MOT alerts" />
-
-        <div class="alert-toggle-row">
-          <label class="switch">
-            <input type="checkbox" id="alertsToggle" />
-            <span class="slider"></span>
-          </label>
-          <span id="alertsLabel">Alerts OFF</span>
+          <div id="vehicleList"></div>
         </div>
 
-        <button id="checkBtn" class="primary-btn" type="button">
-          Check Vehicle
-        </button>
+      </section>
+    </main>
 
-        <div class="vehicle-meta-grid">
-          <input id="vehicleNameInput" type="text" placeholder="Vehicle name (optional)" />
-          <input id="vehicleTypeInput" type="text" placeholder="Type (Car / Van / etc)" />
-          <input id="vehicleColourInput" type="text" placeholder="Colour" />
-          <input id="insuranceInput" type="text" placeholder="Insurance Expiry (YYYY-MM-DD)" />
-        </div>
-
-      </div>
-
-      <!-- RESULT -->
-      <div id="resultBox" class="result-box"></div>
-
-      <!-- UPGRADE -->
-      <div class="upgrade-box">
-        <div class="upgrade-eyebrow">Premium</div>
-        <p><strong>Never miss an MOT again</strong></p>
-
-        <div class="upgrade-copy">
-          Get reminder support and a more complete compliance workflow.
-        </div>
-
-        <a
-          href="https://buy.stripe.com/test_aFadRa61O4lidDw7J20Jq04?success_url=https://www.getfleetsignal.com/app.html?success=true&cancel_url=https://www.getfleetsignal.com/app.html"
-          class="upgrade-btn"
-        >
-          Upgrade to Premium
-        </a>
-      </div>
-
-    </div>
-
-    <!-- VEHICLE LIST -->
-    <div class="card vehicle-list-card">
-      <div class="section-head">
-        <h3>Your Vehicles</h3>
-        <p class="section-subtext">Saved vehicles appear here.</p>
-      </div>
-
-      <div id="vehicleList"></div>
-    </div>
+    <nav class="bottom-nav">
+      <div class="nav-item active">🚗<span>Vehicles</span></div>
+      <div class="nav-item">🔔<span>Alerts</span></div>
+      <div class="nav-item">⚙️<span>Settings</span></div>
+    </nav>
 
   </div>
 
-  <!-- JS -->
   <script src="app.js"></script>
-
-    </div>
-
-  <div class="bottom-nav">
-    <div class="nav-item active">🚗<span>Vehicles</span></div>
-    <div class="nav-item">🔔<span>Alerts</span></div>
-    <div class="nav-item">⚙️<span>Settings</span></div>
-  </div>
-
-</div>
 </body>
 </html>
