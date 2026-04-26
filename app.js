@@ -192,133 +192,72 @@ async function checkVehicle() {
 // LOAD VEHICLES (PREMIUM FINAL)
 // =======================
 async function loadVehicles() {
- if (isLoadingVehicles) return;
+  if (isLoadingVehicles) return;
 
- isLoadingVehicles = true;
+  isLoadingVehicles = true;
 
- const list = getEl("vehicleList");
- if (!list) {
-   isLoadingVehicles = false;
-   return;
- }
+  const list = getEl("vehicleList");
+  if (!list) return;
 
- list.innerHTML = "";
+  list.innerHTML = "";
 
- const { data: { user } } = await client.auth.getUser();
+  const { data: { user } } = await client.auth.getUser();
 
- if (!user) {
-   list.innerHTML = getEmptyVehicleState();
-   isLoadingVehicles = false;
-   return;
- }
+  if (!user) {
+    list.innerHTML = "<p>No vehicles</p>";
+    isLoadingVehicles = false;
+    return;
+  }
 
- const { data, error } = await client
-   .from("vehicles")
-   .select("*")
-   .eq("user_id", user.id)
-   .order("created_at", { ascending: false });
+  const { data, error } = await client
+    .from("vehicles")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
 
- if (error || !data || !data.length) {
-   list.innerHTML = getEmptyVehicleState();
-   isLoadingVehicles = false;
-   return;
- }
+  if (error || !data || data.length === 0) {
+    list.innerHTML = "<p>No vehicles</p>";
+    isLoadingVehicles = false;
+    return;
+  }
 
- data.forEach(v => {
-   const row = document.createElement("div");
-
-   const motClass = getMotClass(v.mot_status, v.mot_days);
-   const taxClass = getTaxClass(v.tax_status);
-   const icon = getVehicleIcon(v);
-   const makeColour = [v.make, v.colour].filter(Boolean).join(" • ");
-
-   row.className = `vehicle-card ${motClass}`;
-
-   row.innerHTML = `
-     <div class="vehicle-top">
-       <div class="vehicle-left">
-         <div class="vehicle-icon">${icon}</div>
-
-         <div>
-           <div class="vehicle-reg">${v.reg || "UNKNOWN"}</div>
-           <div class="vehicle-meta">
-             ${makeColour || "Vehicle details saved"}
-             ${getMotCountdown(v.mot_days)}
-           </div>
-         </div>
-       </div>
-
-       <button class="delete-btn" type="button" aria-label="Delete vehicle">×</button>
-     </div>
-
-     <div class="vehicle-status">
-       <div class="status-pill ${motClass}">
-         <span class="dot"></span>
-         MOT: ${v.mot_status || "Unknown"}
-       </div>
-
-       <div class="status-pill ${taxClass}">
-         <span class="dot"></span>
-         TAX: ${v.tax_status || "Unknown"}
-       </div>
-     </div>
-   `;
-
-   row.querySelector(".delete-btn").onclick = async () => {
-     await client.from("vehicles").delete().eq("id", v.id);
-     loadVehicles();
-   };
-
-   list.appendChild(row);
- });
-
- isLoadingVehicles = false;
-}
-
+  // ✅ THIS MUST BE INSIDE THE FUNCTION (not after)
   data.forEach(v => {
+
     const row = document.createElement("div");
 
     const motClass = getMotClass(v.mot_status, v.mot_days);
     const taxClass = getTaxClass(v.tax_status);
     const icon = getVehicleIcon(v);
 
-    // Apply card + MOT urgency class
-    row.className = `vehicle-card premium ${motClass}`;
+    row.className = `vehicle-card ${motClass}`;
 
     row.innerHTML = `
       <div class="vehicle-top">
-
         <div class="vehicle-left">
           <div class="vehicle-icon">${icon}</div>
           <div>
             <div class="vehicle-reg">${v.reg}</div>
-            <div class="vehicle-meta">
-              ${v.make || ""} ${v.colour || ""}
-              ${getMotCountdown(v.mot_days)}
-            </div>
+            <div class="vehicle-meta">${v.make || ""} ${v.colour || ""}</div>
           </div>
         </div>
 
-        <button class="delete-btn" data-id="${v.id}">✕</button>
-
+        <button class="delete-btn">✕</button>
       </div>
 
       <div class="vehicle-status">
-
         <div class="status-pill ${motClass}">
           <span class="dot"></span>
-          MOT: ${v.mot_status || "Unknown"}
+          MOT: ${v.mot_status}
         </div>
 
         <div class="status-pill ${taxClass}">
           <span class="dot"></span>
-          TAX: ${v.tax_status || "Unknown"}
+          TAX: ${v.tax_status}
         </div>
-
       </div>
     `;
 
-    // Clean delete binding (no duplicates)
     row.querySelector(".delete-btn").onclick = async () => {
       await client.from("vehicles").delete().eq("id", v.id);
       loadVehicles();
@@ -328,6 +267,7 @@ async function loadVehicles() {
   });
 
   isLoadingVehicles = false;
+}
 
 // =======================
 // INIT
@@ -384,15 +324,12 @@ client.auth.onAuthStateChange((event, session) => {
   }
 });
 
-
 // =======================
 // START
 // =======================
 document.addEventListener("DOMContentLoaded", initApp);
 
-// =======================
-// VEHICLE HELPERS (UPGRADED)
-// =======================
+
 // =======================
 // VEHICLE HELPERS
 // =======================
