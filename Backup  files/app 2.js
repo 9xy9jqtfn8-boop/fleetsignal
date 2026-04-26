@@ -218,33 +218,13 @@ async function loadVehicles() {
     const row = document.createElement("div");
     row.className = "vehicle-card";
 
-    row.className = "vehicle-card premium " + getMotClass(v.mot_status, v.mot_days);
-
-row.innerHTML = `
-  <div class="vehicle-top">
-    <div class="vehicle-left">
-      <div class="vehicle-icon">${getVehicleIcon(v)}</div>
-      <div>
-        <div class="vehicle-reg">${v.reg}</div>
-        <div class="vehicle-meta">${v.make || ""} ${v.colour || ""}</div>
-      </div>
-    </div>
-
-    <button onclick="deleteVehicle('${v.id}')" class="delete-btn">✕</button>
-  </div>
-
-  <div class="vehicle-status">
-    <div class="status-pill ${getMotClass(v.mot_status, v.mot_days)}">
-      <span class="dot"></span>
-      MOT: ${v.mot_status}
-    </div>
-
-    <div class="status-pill ${getTaxClass(v.tax_status)}">
-      <span class="dot"></span>
+    row.innerHTML = `
+      <strong>${v.reg}</strong><br>
+      MOT: ${v.mot_status}<br>
       TAX: ${v.tax_status}
-    </div>
-  </div>
-`;
+      <br><br>
+      <button>Delete</button>
+    `;
 
     row.querySelector("button").onclick = async () => {
       await client.from("vehicles").delete().eq("id", v.id);
@@ -323,37 +303,3 @@ client.auth.onAuthStateChange((event, session) => {
 // START
 // =======================
 document.addEventListener("DOMContentLoaded", initApp);
-
-// =======================
-// START
-// =======================
-document.addEventListener("DOMContentLoaded", initApp);
-
-
-// 👇👇 ADD FUNCTIONS HERE (VERY BOTTOM)
-
-// =======================
-// VEHICLE HELPERS
-// =======================
-function getMotClass(status, days) {
-  if (status === "Expired") return "red";
-  if (days <= 7) return "red";
-  if (days <= 30) return "yellow";
-  return "green";
-}
-
-function getTaxClass(status) {
-  if (status === "Taxed") return "green";
-  if (status === "SORN") return "yellow";
-  return "red";
-}
-
-function getVehicleIcon(v) {
-  const make = (v.make || "").toLowerCase();
-
-  if (["honda","yamaha","ducati"].includes(make)) return "🏍️";
-  if (make.includes("transit") || make.includes("sprinter")) return "🚐";
-  if (["daf","scania","volvo"].includes(make)) return "🚛";
-
-  return "🚗";
-}
