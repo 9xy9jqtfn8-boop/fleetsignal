@@ -1,4 +1,3 @@
-
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -11,6 +10,10 @@ export default async function handler(req, res) {
   try {
     const { userId } = req.body;
 
+    if (!userId) {
+      return res.status(400).json({ error: "Missing userId" });
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
 
@@ -21,17 +24,20 @@ export default async function handler(req, res) {
         },
       ],
 
-      success_url: "https://getfleetsignal.com/app.html?success=true",
+      // ✅ CRITICAL FIX: pass session_id back to app
+      success_url: `https://getfleetsignal.com/app.html?session_id={CHECKOUT_SESSION_ID}`,
+
       cancel_url: "https://getfleetsignal.com/app.html",
 
+      // ✅ CRITICAL FIX: match verifySession.js
       metadata: {
-        userId: userId,
+        user_id: userId,
       },
     });
 
     res.status(200).json({ url: session.url });
   } catch (err) {
-    console.error(err);
+    console.error("Stripe checkout error:", err);
     res.status(500).json({ error: "Stripe error" });
   }
 }

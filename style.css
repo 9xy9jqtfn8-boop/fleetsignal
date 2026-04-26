@@ -48,7 +48,19 @@ body {
 }
 
 .hidden {
-  display: none !important;
+  display: none;
+}
+
+#dashboardBox.active {
+  display: block !important;
+}
+
+#authBox.active {
+  display: block !important;
+}
+
+#authBox:not(.hidden) {
+  display: flex;
 }
 
 .container {
