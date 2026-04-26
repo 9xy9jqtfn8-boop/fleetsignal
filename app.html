@@ -22,21 +22,20 @@
 
 <body>
 
-  <!-- TOP BAR -->
-  <div class="top-bar">
-    <div class="top-left">
-      <span class="logo-mark">🚗</span>
-      <span class="logo-text">FleetSignal</span>
-    </div>
+  <div class="app-shell">
 
-    <div class="top-right">
-      <span id="headerUserEmail" class="header-user-email"></span>
-      <span id="headerPlanBadge" class="badge free"></span>
+  <div class="status-bar"></div>
+
+  <div class="app-header">
+    <div class="header-left">🚗 FleetSignal</div>
+
+    <div class="header-right">
+      <span id="headerUserEmail"></span>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
     </div>
-      <button id="logoutBtn" class="logout-btn" type="button">
-      Logout
-    </button>
-</div>
+  </div>
+
+  <div class="app-content">
   </div>
 
   <!-- LOGIN -->
@@ -161,5 +160,14 @@
   <!-- JS -->
   <script src="app.js"></script>
 
+    </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active">🚗<span>Vehicles</span></div>
+    <div class="nav-item">🔔<span>Alerts</span></div>
+    <div class="nav-item">⚙️<span>Settings</span></div>
+  </div>
+
+</div>
 </body>
 </html>

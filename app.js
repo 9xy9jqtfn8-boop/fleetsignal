@@ -184,7 +184,7 @@ async function checkVehicle() {
 }
 
 // =======================
-// LOAD VEHICLES
+// LOAD VEHICLES (PREMIUM FINAL)
 // =======================
 async function loadVehicles() {
   if (isLoadingVehicles) return;
@@ -208,7 +208,7 @@ async function loadVehicles() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  if (error || !data.length) {
+  if (error || !data || !data.length) {
     list.innerHTML = "<p>No vehicles</p>";
     isLoadingVehicles = false;
     return;
@@ -216,37 +216,49 @@ async function loadVehicles() {
 
   data.forEach(v => {
     const row = document.createElement("div");
-    row.className = "vehicle-card";
 
-    row.className = "vehicle-card premium " + getMotClass(v.mot_status, v.mot_days);
+    const motClass = getMotClass(v.mot_status, v.mot_days);
+    const taxClass = getTaxClass(v.tax_status);
+    const icon = getVehicleIcon(v);
 
-row.innerHTML = `
-  <div class="vehicle-top">
-    <div class="vehicle-left">
-      <div class="vehicle-icon">${getVehicleIcon(v)}</div>
-      <div>
-        <div class="vehicle-reg">${v.reg}</div>
-        <div class="vehicle-meta">${v.make || ""} ${v.colour || ""}</div>
+    // Apply card + MOT urgency class
+    row.className = `vehicle-card premium ${motClass}`;
+
+    row.innerHTML = `
+      <div class="vehicle-top">
+
+        <div class="vehicle-left">
+          <div class="vehicle-icon">${icon}</div>
+          <div>
+            <div class="vehicle-reg">${v.reg}</div>
+            <div class="vehicle-meta">
+              ${v.make || ""} ${v.colour || ""}
+              ${getMotCountdown(v.mot_days)}
+            </div>
+          </div>
+        </div>
+
+        <button class="delete-btn" data-id="${v.id}">✕</button>
+
       </div>
-    </div>
 
-    <button onclick="deleteVehicle('${v.id}')" class="delete-btn">✕</button>
-  </div>
+      <div class="vehicle-status">
 
-  <div class="vehicle-status">
-    <div class="status-pill ${getMotClass(v.mot_status, v.mot_days)}">
-      <span class="dot"></span>
-      MOT: ${v.mot_status}
-    </div>
+        <div class="status-pill ${motClass}">
+          <span class="dot"></span>
+          MOT: ${v.mot_status || "Unknown"}
+        </div>
 
-    <div class="status-pill ${getTaxClass(v.tax_status)}">
-      <span class="dot"></span>
-      TAX: ${v.tax_status}
-    </div>
-  </div>
-`;
+        <div class="status-pill ${taxClass}">
+          <span class="dot"></span>
+          TAX: ${v.tax_status || "Unknown"}
+        </div>
 
-    row.querySelector("button").onclick = async () => {
+      </div>
+    `;
+
+    // Clean delete binding (no duplicates)
+    row.querySelector(".delete-btn").onclick = async () => {
       await client.from("vehicles").delete().eq("id", v.id);
       loadVehicles();
     };
@@ -329,20 +341,20 @@ document.addEventListener("DOMContentLoaded", initApp);
 // =======================
 document.addEventListener("DOMContentLoaded", initApp);
 
-
-// 👇👇 ADD FUNCTIONS HERE (VERY BOTTOM)
-
 // =======================
-// VEHICLE HELPERS
+// VEHICLE HELPERS (UPGRADED)
 // =======================
+
 function getMotClass(status, days) {
   if (status === "Expired") return "red";
+  if (days === null || days === undefined) return "yellow";
   if (days <= 7) return "red";
   if (days <= 30) return "yellow";
   return "green";
 }
 
 function getTaxClass(status) {
+  if (!status) return "yellow";
   if (status === "Taxed") return "green";
   if (status === "SORN") return "yellow";
   return "red";
@@ -350,10 +362,60 @@ function getTaxClass(status) {
 
 function getVehicleIcon(v) {
   const make = (v.make || "").toLowerCase();
+  const type = (v.vehicle_type || "").toLowerCase();
 
-  if (["honda","yamaha","ducati"].includes(make)) return "🏍️";
-  if (make.includes("transit") || make.includes("sprinter")) return "🚐";
-  if (["daf","scania","volvo"].includes(make)) return "🚛";
+  // MOTORBIKES
+  const bikes = [
+    "honda","yamaha","kawasaki","ducati","ktm","suzuki","triumph","bmw motorrad"
+  ];
 
+  // VANS
+  const vans = [
+    "transit","sprinter","vivaro","trafic","crafter","ducato","boxer","relay","nv200","nv300","nv400"
+  ];
+
+  // HGV / LORRIES
+  const hgvs = [
+    "daf","scania","volvo","man","iveco","mercedes actros","renault trucks"
+  ];
+
+  // MOTORBIKE DETECT
+  if (bikes.some(b => make.includes(b)) || type.includes("motorcycle")) {
+    return "🏍️";
+  }
+
+  // VAN DETECT
+  if (vans.some(vn => make.includes(vn)) || type.includes("van")) {
+    return "🚐";
+  }
+
+  // HGV DETECT
+  if (hgvs.some(h => make.includes(h)) || type.includes("hgv") || type.includes("lorry")) {
+    return "🚛";
+  }
+
+  // DEFAULT CAR
   return "🚗";
+}
+
+function getMotCountdown(days) {
+  if (days === null || days === undefined) return "";
+
+  if (days < 0) {
+    return `<div class="mot-countdown" style="color:#ef4444;">Expired</div>`;
+  }
+
+  if (days === 0) {
+    return `<div class="mot-countdown" style="color:#ef4444;">Expires today</div>`;
+  }
+
+  if (days <= 7) {
+    return `<div class="mot-countdown" style="color:#ef4444;">${days} day${days === 1 ? "" : "s"} left</div>`;
+  }
+
+  if (days <= 30) {
+    return `<div class="mot-countdown" style="color:#eab308;">${days} days left</div>`;
+  }
+
+  return `<div class="mot-countdown">${days} days left</div>`;
 }
