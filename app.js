@@ -10,6 +10,78 @@ let currentSession = null;
 let isLoadingVehicles = false;
 
 // =======================
+// MOT CALCULATION
+// =======================
+function getMotStatus(motExpiryDate) {
+  if (!motExpiryDate) {
+    return { status: "Unknown", days: null, color: "grey" };
+  }
+
+  const today = new Date();
+  const expiry = new Date(motExpiryDate);
+
+  const diffTime = expiry - today;
+  const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (days < 0) return { status: "Expired", days, color: "red" };
+  if (days <= 7) return { status: "Expiring", days, color: "red" };
+  if (days <= 30) return { status: "Due Soon", days, color: "orange" };
+
+  return { status: "Valid", days, color: "green" };
+}
+
+function getMotStatusFromDays(days) {
+  if (days === null || days === undefined) {
+    return { status: "Unknown", color: "grey" };
+  }
+
+  if (days < 0) return { status: "Expired", color: "red" };
+  if (days <= 7) return { status: "Expiring", color: "red" };
+  if (days <= 30) return { status: "Due Soon", color: "orange" };
+
+  return { status: "Valid", color: "green" };
+}
+
+// =======================
+// EMAIL ALERT SYSTEM
+// =======================
+async function sendMotAlert(vehicle) {
+  if (!vehicle.alert_email || vehicle.mot_days === null) return;
+
+  if (vehicle.mot_days > 30) return;
+
+  const now = new Date();
+  const lastSent = vehicle.last_alert_sent ? new Date(vehicle.last_alert_sent) : null;
+
+  // 7 day cooldown
+  if (lastSent && (now - lastSent) < (7 * 24 * 60 * 60 * 1000)) {
+    return;
+  }
+
+  try {
+    await fetch("/api/sendAlert", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: vehicle.alert_email,
+        reg: vehicle.reg,
+        motDays: vehicle.mot_days
+      })
+    });
+
+    await client
+      .from("vehicles")
+      .update({ last_alert_sent: new Date().toISOString() })
+      .eq("id", vehicle.id);
+
+  } catch (err) {
+    console.error("Alert failed", err);
+  }
+}
+
+// =======================
 // HELPERS
 // =======================
 function getEl(id) {
@@ -144,7 +216,8 @@ async function forgotPasswordHandler(e) {
 // VEHICLE CHECK
 // =======================
 async function checkVehicle() {
-  const reg = getEl("regInput").value.trim().toUpperCase();
+  const regInput = getEl("regInput");
+  const reg = regInput.value.trim().toUpperCase();
 
   if (!reg) {
     setResultMessage("Enter a registration");
@@ -154,29 +227,56 @@ async function checkVehicle() {
   setResultMessage("Checking...");
 
   try {
+    // ==========================
+    // FETCH FROM YOUR API
+    // ==========================
     const res = await fetch(`/api/mot?reg=${reg}`);
     const data = await res.json();
 
     if (!res.ok) throw new Error(data.error);
 
-    const motStatus = data.motStatus || "Unknown";
+    // ==========================
+    // EXTRACT DATA
+    // ==========================
+    const motExpiryDate = data.motExpiryDate || null;
     const taxStatus = data.taxStatus || "Unknown";
+    const make = data.make || "";
+    const colour = data.colour || "";
 
+    // ==========================
+    // CALCULATE MOT STATUS + DAYS
+    // ==========================
+    const motInfo = getMotStatus(motExpiryDate);
+
+    // ==========================
+    // DISPLAY RESULT (PREMIUM STYLE)
+    // ==========================
     setResultMessage(`
-      <strong>${reg}</strong><br>
-      MOT: ${motStatus}<br>
-      TAX: ${taxStatus}
+      <div class="result-card">
+        <strong>${reg}</strong><br>
+        ${make} ${colour}<br><br>
+
+        MOT: ${motInfo.status}
+        ${motInfo.days !== null ? `(${motInfo.days} days)` : ""}<br>
+
+        TAX: ${taxStatus}
+      </div>
     `);
 
+    // ==========================
+    // SAVE TO SUPABASE
+    // ==========================
     const { data: { user } } = await client.auth.getUser();
-
     if (!user) return;
 
     await client.from("vehicles").insert([
       {
         user_id: user.id,
         reg,
-        mot_status: motStatus,
+        make,
+        colour,
+        mot_status: motInfo.status,
+        mot_days: motInfo.days,
         tax_status: taxStatus
       }
     ]);
@@ -184,6 +284,7 @@ async function checkVehicle() {
     loadVehicles();
 
   } catch (err) {
+    console.error(err);
     setResultMessage("Error checking vehicle");
   }
 }
@@ -221,12 +322,15 @@ async function loadVehicles() {
     return;
   }
 
-  // ✅ THIS MUST BE INSIDE THE FUNCTION (not after)
   data.forEach(v => {
 
-    const row = document.createElement("div");
+  const mot = getMotStatusFromDays(v.mot_days);
+  v.mot_status = mot.status;
+  v.mot_days = mot.days;
 
-    const motClass = getMotClass(v.mot_status, v.mot_days);
+  const row = document.createElement("div");
+
+  const motClass = getMotClass(v.mot_status, v.mot_days);
     const taxClass = getTaxClass(v.tax_status);
     const icon = getVehicleIcon(v);
 
@@ -248,7 +352,7 @@ async function loadVehicles() {
       <div class="vehicle-status">
         <div class="status-pill ${motClass}">
           <span class="dot"></span>
-          MOT: ${v.mot_status}
+         MOT: ${v.mot_status}${v.mot_days != null ? ` (${v.mot_days} days)` : ''}
         </div>
 
         <div class="status-pill ${taxClass}">
