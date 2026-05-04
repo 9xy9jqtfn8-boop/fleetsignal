@@ -2,6 +2,7 @@
   "type": "module",
   "dependencies": {
     "@supabase/supabase-js": "^2.103.0",
-    "resend": "^6.10.0"
+    "resend": "^6.10.0",
+    "stripe": "^22.1.0"
   }
 }
