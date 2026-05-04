@@ -653,6 +653,7 @@ function showView(viewId) {
 
 async function initApp() {
  console.log("App starting...");
+
  updateAlertText();
  
  setupButtons();
@@ -765,30 +766,8 @@ function getVehicleIcon(v) {
 
 document.getElementById("upgradeBtn")?.addEventListener("click", async () => {
   try {
-    console.log("Starting checkout...");
-
-    const { data: { session } } = await client.auth.getSession();
-
-    if (!session) {
-      alert("You must be logged in");
-      return;
-    }
-
-    const res = await fetch("/api/create-checkout-session", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: session.user.id,
-      }),
-    });
-
+    const res = await fetch("/api/create-checkout-session");
     const data = await res.json();
-
-    if (!data.url) {
-      throw new Error("No checkout URL returned");
-    }
 
     window.location.href = data.url;
 
@@ -801,9 +780,7 @@ document.getElementById("upgradeBtn")?.addEventListener("click", async () => {
 // =======================
 // STRIPE SUCCESS HANDLER
 // =======================
-async function checkStripeReturn() {
-  console.log("🔥 checkStripeReturn running");
-
+(async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const sessionId = urlParams.get("session_id");
 
@@ -816,23 +793,21 @@ async function checkStripeReturn() {
     const data = await res.json();
 
     if (data.success) {
-      console.log("✅ Premium activated");
+      console.log("Premium activated!");
 
-      // Clean URL
+      alert("✅ Premium activated!");
+
+      // remove session_id from URL (clean)
       window.history.replaceState({}, document.title, "/app.html");
 
-      // Reload to update UI
+      // OPTIONAL: reload UI
       location.reload();
-    } else {
-      console.warn("Verification failed response:", data);
     }
 
   } catch (err) {
-    console.error("Verification failed:", err);
+    console.error("Verification error:", err);
   }
-}
-
-checkStripeReturn();
+})();
 
 // =======================
 // SHOW USER EMAIL
@@ -849,27 +824,16 @@ checkStripeReturn();
 // CHECK PREMIUM STATUS
 // =======================
 (async () => {
- const { data: { user } } = await client.auth.getUser();
- if (!user) return;
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) return;
 
- const { data, error } = await client
-   .from("profiles")
-   .select("is_premium")
-   .eq("id", user.id)
-   .single();
+  const { data } = await client
+    .from("profiles")
+    .select("is_premium")
+    .eq("id", user.id)
+    .single();
 
- if (error) {
-   console.error("Premium check error:", error);
-   return;
- }
-
- if (data?.is_premium) {
-   console.log("✅ User is premium");
-
-   document.querySelector(".upgrade-box")?.remove();
-
-   // OPTIONAL: turn alerts on automatically
-   const toggle = document.getElementById("alertsToggle");
-   if (toggle) toggle.checked = true;
- }
+  if (data?.is_premium) {
+    document.querySelector(".upgrade-box")?.remove();
+  }
 })();

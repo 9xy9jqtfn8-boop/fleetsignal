@@ -20,6 +20,7 @@
 <body>
   <div class="app-shell">
 
+    <!-- HEADER -->
     <header class="app-header">
       <div class="header-left">
         <span class="logo-mark">🚗</span>
@@ -60,86 +61,142 @@
       </section>
 
       <!-- DASHBOARD -->
-      <section id="dashboardBox" class="container hidden">
+      <section id="vehiclesView" class="container">
 
-        <div class="dashboard-hero">
-          <div>
-            <h1>Fleet Dashboard</h1>
-            <p>Track MOT, tax and reminders in one clean view.</p>
-          </div>
-          <div class="hero-icon">🚗</div>
+  <!-- HERO (REG INPUT ONLY) -->
+  <div class="reg-hero">
+    <div class="reg-glow"></div>
+
+    <div class="reg-card">
+
+      <div class="reg-label">Enter registration</div>
+
+      <!-- REAL PLATE INPUT -->
+      <div class="plate-wrapper">
+        
+        <div class="plate-uk">
+          <span class="uk-flag">🇬🇧</span>
+          <span class="uk-text">UK</span>
         </div>
 
-        <div class="card dashboard-card">
+        <input 
+          id="regInput" 
+          type="text"
+          placeholder="AB12 CDE"
+          maxlength="8"
+          autocomplete="off"
+        />
 
-          <div class="user-bar">
-            <div class="user-bar-left">
-              <div class="user-bar-label">Signed in as</div>
-              <div id="dashboardUserEmail" class="dashboard-user-email"></div>
-            </div>
+      </div>
 
-            <div class="user-bar-right">
-              <span id="dashboardPlanBadge" class="badge free">Free</span>
-            </div>
-          </div>
+      <!-- BUTTON -->
+      <button id="checkBtn" class="check-btn">
+        Check Vehicle
+      </button>
 
-          <div class="form-section">
-            <input id="regInput" type="text" placeholder="Registration" style="text-transform: uppercase;" />
+    </div>
+  </div>
 
-            <input id="alertEmailInput" type="email" placeholder="Email for MOT alerts" />
+  <!-- RESULT -->
+  <div id="resultSection">
+    <div id="resultBox" class="result-box"></div>
+  </div>
 
-            <div class="alert-toggle-row">
-              <label class="switch">
-                <input type="checkbox" id="alertsToggle" />
-                <span class="slider"></span>
-              </label>
-              <span id="alertsLabel">Alerts OFF</span>
-            </div>
+  <!-- DETAILS -->
+  <div id="detailsSection" class="card">
 
-            <button id="checkBtn" class="primary-btn" type="button">Check Vehicle</button>
+    <h3>Add details (optional)</h3>
 
-            <div class="vehicle-meta-grid">
-              <input id="vehicleNameInput" type="text" placeholder="Vehicle name (optional)" />
-              <input id="vehicleTypeInput" type="text" placeholder="Type (Car / Van / etc)" />
-              <input id="vehicleColourInput" type="text" placeholder="Colour" />
-              <input id="insuranceInput" type="text" placeholder="Insurance Expiry (YYYY-MM-DD)" />
-            </div>
-          </div>
+    <div class="vehicle-meta-grid">
 
-          <div id="resultBox" class="result-box"></div>
+      <input id="vehicleNameInput" type="text" placeholder="Vehicle name (optional)" />
+      <input id="vehicleTypeInput" type="text" placeholder="Type (Car / Van / etc)" />
+      <input id="vehicleColourInput" type="text" placeholder="Colour" />
 
-          <div class="upgrade-box">
-            <div class="upgrade-eyebrow">Premium</div>
-            <p><strong>Never miss an MOT again</strong></p>
-            <div class="upgrade-copy">
-              Get reminder support and a more complete compliance workflow.
-            </div>
+      <div class="input-group">
+        <label class="input-label">Tax Renewal Date</label>
+        <input id="taxDueDate" type="date" class="input" />
+      </div>
 
-            <a
-              href="https://buy.stripe.com/test_aFadRa61O4lidDw7J20Jq04?success_url=https://www.getfleetsignal.com/app.html?success=true&cancel_url=https://www.getfleetsignal.com/app.html"
-              class="upgrade-btn"
-            >
-              Upgrade to Premium
-            </a>
-          </div>
+      <div class="input-group">
+        <label class="input-label">Insurance Expiry</label>
+        <input id="insuranceInput" type="date" class="input" />
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div id="alertsSection" class="card">
+
+    <h3>Alerts</h3>
+
+    <div class="alert-toggle-row">
+      <label class="switch">
+        <input type="checkbox" id="alertsToggle" />
+        <span class="slider"></span>
+      </label>
+      <span id="alertsLabel">Alerts OFF</span>
+    </div>
+
+    <input 
+      id="alertEmailInput" 
+      type="email" 
+      placeholder="Email for MOT alerts" 
+    />
+
+  </div>
+
+  <!-- PREMIUM -->
+  <div class="upgrade-box">
+    <div class="upgrade-eyebrow">Premium</div>
+    <p><strong>Never miss an MOT again</strong></p>
+    <div class="upgrade-copy">
+      Get reminder support and a more complete compliance workflow.
+    </div>
+
+    <a
+     <button id="upgradeBtn" class="upgrade-btn">
+     Upgrade to Premium
+    </button>
+  
+  </div>
+
+  <!-- VEHICLES -->
+  <div class="card vehicle-list-card">
+    <div class="section-head">
+      <h3>Your Vehicles</h3>
+      <p class="section-subtext">Saved vehicles appear here.</p>
+    </div>
+
+    <div id="vehicleList"></div>
+  </div>
+
+</section>
+
+      <!-- ALERTS VIEW -->
+      <section id="alertsView" class="container hidden">
+        <div class="card">
+          <h2>Alerts</h2>
+          <p>Your MOT reminders will appear here.</p>
         </div>
-
-        <div class="card vehicle-list-card">
-          <div class="section-head">
-            <h3>Your Vehicles</h3>
-            <p class="section-subtext">Saved vehicles appear here.</p>
-          </div>
-
-          <div id="vehicleList"></div>
-        </div>
-
       </section>
+
+      <!-- SETTINGS VIEW -->
+      <section id="settingsView" class="container hidden">
+        <div class="card">
+          <h2>Settings</h2>
+          <p>Manage your account and preferences.</p>
+        </div>
+      </section>
+
     </main>
 
+    <!-- NAV -->
     <nav class="bottom-nav">
-      <div class="nav-item active">🚗<span>Vehicles</span></div>
-      <div class="nav-item">🔔<span>Alerts</span></div>
-      <div class="nav-item">⚙️<span>Settings</span></div>
+      <div id="navVehicles" class="nav-item active">🚗<span>Vehicles</span></div>
+      <div id="navAlerts" class="nav-item">🔔<span>Alerts</span></div>
+      <div id="navSettings" class="nav-item">⚙️<span>Settings</span></div>
     </nav>
 
   </div>

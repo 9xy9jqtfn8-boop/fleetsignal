@@ -9,7 +9,6 @@ const supabase = createClient(
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req, res) {
-
   const secret = req.query.secret;
 
   if (!secret || secret !== process.env.CRON_SECRET) {
@@ -19,7 +18,7 @@ export default async function handler(req, res) {
   try {
     const now = new Date();
 
-    // 1. Get all vehicles with alert emails
+    // Get ONLY vehicles that actually have emails
     const { data: vehicles, error } = await supabase
       .from("vehicles")
       .select("*")
@@ -35,8 +34,8 @@ export default async function handler(req, res) {
     for (const v of vehicles) {
       const motDays = v.mot_days;
 
-      // Only if MOT < 30 days
-      if (typeof motDays !== "number" || motDays <= 0 || motDays >= 30) {
+      // Only send if between 1–30 days
+      if (typeof motDays !== "number" || motDays <= 0 || motDays > 30) {
         continue;
       }
 
@@ -47,27 +46,37 @@ export default async function handler(req, res) {
       const daysSinceLast =
         lastSent ? (now - lastSent) / (1000 * 60 * 60 * 24) : null;
 
-      // Only send if never sent OR 7+ days passed
-      if (!lastSent || daysSinceLast >= 7) {
-        try {
-          await resend.emails.send({
-            from: "FleetSignal <alerts@getfleetsignal.com>",
-            to: v.alert_email,
-            subject: `MOT Alert for ${v.reg}`,
-            html: `<p>Your vehicle <strong>${v.reg}</strong> has ${motDays} days left on MOT.</p>`,
-          });
+      // 7 day cooldown
+      if (lastSent && daysSinceLast < 7) {
+        continue;
+      }
 
-          await supabase
-            .from("vehicles")
-            .update({
-              last_alert_sent: new Date().toISOString(),
-            })
-            .eq("id", v.id);
+      try {
+        await resend.emails.send({
+          from: "FleetSignal <alerts@getfleetsignal.com>",
+          to: v.alert_email,
+          subject: `MOT Alert for ${v.reg}`,
+          html: `
+            <div style="font-family: Arial; padding:20px;">
+              <h2>🚗 FleetSignal Alert</h2>
+              <p><strong>${v.reg}</strong></p>
+              <p>Your MOT expires in:</p>
+              <h1 style="color:red;">${motDays} days</h1>
+              <p>Book early to avoid fines.</p>
+            </div>
+          `,
+        });
 
-          sent++;
-        } catch (err) {
-          console.error("Email failed:", v.reg, err);
-        }
+        await supabase
+          .from("vehicles")
+          .update({
+            last_alert_sent: new Date().toISOString(),
+          })
+          .eq("id", v.id);
+
+        sent++;
+      } catch (err) {
+        console.error("Email failed:", v.reg, err);
       }
     }
 
