@@ -177,38 +177,23 @@ async function showDashboard(session) {
  const alertEmailInput = document.getElementById("alertEmailInput");
 
  if (alertEmailInput && session?.user?.email) {
-   alertEmailInput.value = session.user.email;
-   alertEmailInput.style.opacity = "0.6";
+   alertEmailInput.placeholder = session.user.email;
  }
 
  if (logoutBtn) logoutBtn.style.display = "inline-flex";
  if (logoutBtn) logoutBtn.style.display = "inline-block";
  
  let isPremium = false;
-let alertsEnabled = false;
-
-try {
+ 
+ try {
   const { data: profile } = await client
     .from("profiles")
-    .select("is_premium, alerts_enabled")
+    .select("is_premium")
     .eq("id", session.user.id)
     .maybeSingle();
 
-  isPremium = profile?.is_premium ?? false;
-  alertsEnabled = profile?.alerts_enabled ?? false;
-
-  const headerPlanBadge = document.getElementById("headerPlanBadge");
-  const dashboardPlanBadge = document.getElementById("dashboardPlanBadge");
-
-  if (headerPlanBadge) {
-    headerPlanBadge.textContent = isPremium ? "PREMIUM" : "FREE";
-    headerPlanBadge.className = isPremium ? "badge premium" : "badge free";
-  }
-
-  if (dashboardPlanBadge) {
-    dashboardPlanBadge.textContent = isPremium ? "PREMIUM" : "FREE";
-    dashboardPlanBadge.className = isPremium ? "badge premium" : "badge free";
-  }
+    isPremium = profile?.is_premium;
+    const alertsEnabled = profile?.alerts_enabled;
 
   if (upgradeBox) {
     upgradeBox.style.display = isPremium ? "none" : "block";
@@ -734,20 +719,18 @@ async function initApp() {
  const urlParams = new URLSearchParams(window.location.search);
  const sessionId = urlParams.get("session_id");
 
-  if (sessionId) {
+if (sessionId) {
   console.log("Stripe return detected");
 
   try {
-    await fetch(`/api/verify-Session?session_id=${sessionId}`);
-
-    // 🔥 instantly update UI WITHOUT reload
-    const { data: sessionData } = await client.auth.getSession();
-    if (sessionData?.session) {
-      showDashboard(sessionData.session);
-    }
+    await fetch(`/api/verify-session?session_id=${sessionId}`);
 
     // clean URL
     window.history.replaceState({}, document.title, "/app.html");
+
+    // 🔥 force instant UI refresh
+    showDashboard(data.session);
+    return;
 
   } catch (err) {
     console.error("Verification failed", err);
