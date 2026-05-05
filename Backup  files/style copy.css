@@ -1154,3 +1154,362 @@ input:checked + .slider:before {
   color: #d97706;
   box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
 }
+
+/* =========================
+   NEXT LEVEL REG HERO (FINAL CLEAN)
+========================= */
+
+.reg-hero {
+  position: relative;
+  max-width: 520px;
+  margin: 0 auto 16px auto;
+}
+
+/* GLOW BACKGROUND */
+.reg-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(37,99,235,0.25), transparent 70%);
+  filter: blur(40px);
+  z-index: 0;
+}
+
+/* CARD */
+.reg-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.1),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  text-align: center;
+  animation: floatCard 4s ease-in-out infinite;
+}
+
+/* LABEL */
+.reg-label {
+  font-size: 13px;
+  color: #666;
+}
+
+/* =========================
+   UK NUMBER PLATE (REAL LOOK)
+========================= */
+
+.plate-wrapper {
+  position: relative; /* IMPORTANT */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ffda44;
+  border-radius: 6px;
+  border: 2px solid #111;
+
+  padding: 4px;
+  height: 60px;
+
+  transition: all 0.2s ease;
+}
+
+/* UK STRIP */
+.plate-uk {
+  position: absolute;
+  left: 6px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background: #1e3a8a;
+  color: white;
+
+  padding: 4px;
+  border-radius: 4px;
+  min-width: 24px;
+}
+
+.uk-flag {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.uk-text {
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* PLATE INPUT (TRUE CENTERED) */
+.plate-wrapper input {
+  position: absolute;
+  left: 0;
+  right: 0;
+
+  border: none;
+  background: transparent;
+
+  text-align: center;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: #111;
+
+  outline: none;
+  text-transform: uppercase;
+  font-family: "Arial Black", Arial, sans-serif;
+}
+
+/* KILL OLD INPUT STYLES */
+#regInput {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* FOCUS */
+.plate-wrapper:focus-within {
+  transform: scale(1.02);
+  box-shadow:
+    0 0 0 3px rgba(37,99,235,0.2),
+    0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* BUTTON */
+.check-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.check-btn:active {
+  transform: scale(0.97);
+}
+
+/* FLOAT ANIMATION */
+@keyframes floatCard {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0px); }
+}
+
+/* =========================
+   GLOBAL WIDTH FIX (FINAL CLEAN)
+========================= */
+
+/* MAIN PAGE WIDTH */
+.container,
+.reg-hero {
+  max-width: 520px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* REMOVE DOUBLE PADDING ISSUE */
+.container {
+  padding: 0 16px;
+}
+
+/* MAKE CARDS RESPECT WIDTH */
+.card {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 14px;
+}
+
+/* FIX HERO SPACING */
+.reg-hero {
+  margin: 0 auto 10px auto;
+}
+
+/* REMOVE EXTRA GAP FROM NEXT SECTION */
+#detailsSection {
+  margin-top: 0;
+}
+
+/* =========================
+   FINAL POLISH (DROP-IN)
+========================= */
+
+/* FIX GLOBAL WIDTH + CONSISTENCY */
+.container,
+.reg-hero {
+  max-width: 520px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.container {
+  padding: 0 16px;
+}
+
+.card {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 14px;
+  border-radius: 20px;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+}
+
+/* FIX HERO SPACING */
+.reg-hero {
+  margin: 0 auto 12px auto;
+}
+
+/* REMOVE GAP BELOW HERO */
+#detailsSection {
+  margin-top: 0;
+}
+
+/* CONSISTENT SECTION SPACING */
+#resultSection,
+#detailsSection,
+#alertsSection,
+.upgrade-box,
+.vehicle-list-card {
+  margin-top: 14px;
+}
+
+/* =========================
+   PERFECT NUMBER PLATE
+========================= */
+
+.plate-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #ffda44;
+  border-radius: 8px;
+  border: 3px solid #111;
+
+  padding: 6px;
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.25),
+    inset 0 2px 0 rgba(255,255,255,0.4);
+}
+
+/* UK STRIP BALANCED */
+.plate-uk {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background: #1e3a8a;
+  color: white;
+
+  padding: 6px 6px;
+  margin-right: 8px;
+
+  border-radius: 4px;
+  min-width: 34px;
+}
+
+/* PERFECTLY CENTRED TEXT */
+.plate-wrapper input {
+  flex: 1;
+
+  border: none;
+  background: transparent;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 4px;
+
+  color: #111;
+  outline: none;
+  text-transform: uppercase;
+
+  font-family: "Arial Black", Arial, sans-serif;
+
+  padding: 0;
+  margin: 0;
+}
+
+/* FOCUS = PREMIUM FEEL */
+.plate-wrapper:focus-within {
+  transform: scale(1.02);
+  box-shadow:
+    0 0 0 4px rgba(37,99,235,0.25),
+    0 12px 30px rgba(0,0,0,0.3);
+}
+
+/* =========================
+   BUTTON POLISH
+========================= */
+
+.check-btn {
+  margin-top: 14px;
+  width: 100%;
+  padding: 16px;
+
+  border-radius: 16px;
+  border: none;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+
+  transition: all 0.2s ease;
+}
+
+.check-btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 18px rgba(37,99,235,0.35);
+}
+
+.check-btn:active {
+  transform: scale(0.97);
+}
+
+/* =========================
+   RESULT CARD UPGRADE
+========================= */
+
+.result-card {
+  border-radius: 18px;
+  padding: 16px;
+
+  background: linear-gradient(180deg, #ffffff, #f9fafb);
+
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.06);
+
+  font-size: 15px;
+}
+
+/* =========================
+   SMOOTH APP FEEL
+========================= */
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}

@@ -145,13 +145,13 @@ function showView(viewId) {
 // =======================
 function showLogin() {
  const authBox = getEl("authBox");
- const dashboardBox = getEl("dashboardBox");
+ const dashboardBox = getEl("vehiclesView");
  const logoutBtn = getEl("logoutBtn");
  const headerEmail = getEl("headerUserEmail");
 
  if (authBox) authBox.classList.remove("hidden");
  if (dashboardBox) dashboardBox.classList.add("hidden");
-
+ if (bottomNav) bottomNav.classList.add("hidden");
  if (logoutBtn) logoutBtn.style.display = "none";
  if (headerEmail) headerEmail.innerText = "";
 }
@@ -167,7 +167,9 @@ function showDashboard(session) {
 
  if (authBox) authBox.classList.add("hidden");
  if (dashboardBox) dashboardBox.classList.remove("hidden");
-
+ 
+ const bottomNav = document.getElementById("bottomNav");
+ if (bottomNav) bottomNav.classList.remove("hidden");
  if (emailEl) emailEl.innerText = session.user.email;
  if (headerEmail) headerEmail.innerText = session.user.email;
 
