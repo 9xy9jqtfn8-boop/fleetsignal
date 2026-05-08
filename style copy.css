@@ -26,7 +26,6 @@ html,
 body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
 }
 
 body::before {
@@ -73,20 +72,20 @@ body {
     top: 0;
     z-index: 100;
 
-    overflow: hidden;
-    padding: 12px 18px;
+    height: 78px;
+    padding: 14px 20px;
 
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
+
+    gap: 14px;
+    overflow: hidden;
 
     background:
-      linear-gradient(
-        135deg,
-        rgba(15, 98, 254, 0.96),
-        rgba(59, 130, 246, 0.92)
-      );
+      linear-gradient(135deg,
+      rgba(15, 98, 254, 0.96),
+      rgba(59, 130, 246, 0.92));
 
     color: white;
 
@@ -96,64 +95,44 @@ body {
     -webkit-backdrop-filter: blur(18px);
 }
 
+.header-left,
 .header-right {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
-}
-
-.header-actions {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  align-items: stretch;
+  align-items: center;
+  gap: 10px;
+  flex-wrap:nowrap;
 }
 
-#headerPlanBadge,
-.logout-btn {
-  width: 90px;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 6px 10px;
-  line-height: 1;
-}
+.header-user-email{
 
-.header-user-email {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  max-width:125px;
 
-    gap: 6px;
+  padding:5px 10px;
 
-    min-width: 190px;
-    height: 20px;
+  border-radius:999px;
 
-    padding: 0 18px;
+  background:rgba(255,255,255,0.14);
 
-    border-radius: 999px;
+  border:1px solid rgba(255,255,255,0.16);
 
-    background: rgba(255,255,255,0.14);
+  color:white;
 
-    border: 1px solid rgba(255,255,255,0.16);
+  font-size:11px;
+  font-weight:700;
 
-    color: white;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 
-    font-size: 11px;
-    font-weight: 700;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  flex-shrink:1;
 
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-
-    box-sizing: border-box;
-
-    flex-shrink: 1;
 }
 
 .header-user-email::before{
@@ -192,7 +171,7 @@ body {
 }
 
 .logo-text {
-  font-size: 25px;
+  font-size: 18px;
   font-weight: 900;
   letter-spacing: -0.4px;
 }
@@ -201,8 +180,8 @@ body {
     border: none;
     border-radius: 14px;
 
-    height: 20px;
-    min-width: 80px;
+    height: 38px;
+    min-width: 110px;
 
     padding: 0 16px;
 
@@ -2280,65 +2259,77 @@ input:focus {
 }
 
 /* =========================
-   FLOATING HEADER TRAFFIC
+  FLOATING HEADER TRAFFIC
 ========================= */
 
-.traffic{
-position:absolute;
-font-size:20px;
-opacity:0.22;
-pointer-events:none;
-z-index:0;
+.app-header{
+ position:relative;
+ overflow:hidden;
 }
 
-/* CAR */
-.car-traffic{
-top:6px;
-right:-120px;
-animation:trafficCar 18s linear infinite;
+/* shared vehicle style */
+.app-header::before,
+.app-header::after{
+ position:absolute;
+
+ top:-4px;
+
+ font-size:24px;
+
+ opacity:0.22;
+
+ pointer-events:none;
+
+ white-space:nowrap;
+
+ filter:
+   drop-shadow(0 2px 6px rgba(255,255,255,0.22));
 }
 
-/* VAN */
-.van-traffic{
-top:24px;
-right:-320px;
-animation:trafficVan 24s linear infinite;
+/* CAR + VAN */
+.app-header::before{
+
+ content:"🚗     🚐";
+
+ right:-220px;
+
+ animation:fleetTraffic1 18s linear infinite;
 }
 
 /* LORRY */
-.lorry-traffic{
-top:12px;
-right:-520px;
-animation:trafficLorry 30s linear infinite;
+.app-header::after{
+
+ content:"🚚";
+
+ top:32px;
+
+ right:-80px;
+
+ animation:fleetTraffic2 26s linear infinite;
 }
 
-/* ANIMATIONS */
+/* MAIN TRAFFIC */
+@keyframes fleetTraffic1{
 
-@keyframes trafficCar{
-from{
-transform:translateX(0);
-}
-to{
-transform:translateX(-1600px);
-}
-}
+ 0%{
+   transform:translateX(0);
+ }
 
-@keyframes trafficVan{
-from{
-transform:translateX(0);
-}
-to{
-transform:translateX(-1600px);
-}
+ 100%{
+   transform:translateX(-900px);
+ }
 }
 
-@keyframes trafficLorry{
-from{
-transform:translateX(0);
-}
-to{
-transform:translateX(-1600px);
-}
+/* SECOND LAYER */
+@keyframes fleetTraffic2{
+
+ 0%{
+   transform:translateX(0);
+ }
+
+ 100%{
+   transform:translateX(-1100px);
+ }
 }
 
 /* =========================
@@ -2358,297 +2349,5 @@ transform:translateX(-1600px);
   color:#94a3b8;
 
   opacity:0.9;
-
-}
-
-/* HEADER RIGHT SIDE */
-.header-right{
-    display:flex;
-    align-items:center;
-    gap:18px;
-    margin-left:auto;
-}
-
-/* EMAIL PILL */
-.header-user-email{
-    padding:10px 18px;
-    border-radius:999px;
-    background:rgba(255,255,255,0.15);
-    backdrop-filter:blur(10px);
-    color:white;
-    font-weight:600;
-    font-size:15px;
-    white-space:nowrap;
-}
-
-/* BUTTON STACK */
-.header-actions{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-}
-
-/* MATCH BUTTON SIZES */
-.badge,
-.logout-btn{
-    min-width:140px;
-    height:42px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:999px;
-    font-weight:700;
-}
-
-/* =================================
-   HEADER SIZE FIX
-================================= */
-
-.app-header{
-    padding: 8px 16px;
-    min-height: 82px;
-}
-
-/* LEFT SIDE */
-.header-left{
-    display:flex;
-    align-items:center;
-    gap:8px;
-}
-
-.logo-mark{
-    font-size:24px;
-}
-
-.logo-text{
-    font-size:38px;
-    line-height:1;
-    margin-top:2px;
-}
-
-/* RIGHT SIDE */
-.header-right{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-left:auto;
-}
-
-/* EMAIL */
-.header-user-email{
-    padding:8px 14px;
-    font-size:14px;
-    max-width:240px;
-    overflow:hidden;
-    text-overflow:ellipsis;
-}
-
-/* BUTTON COLUMN */
-.header-actions{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-}
-
-/* BUTTONS */
-.badge,
-.logout-btn{
-    min-width:120px;
-    height:36px;
-    font-size:14px;
-    border-radius:999px;
-}
-
-/* =================================
-   FINAL HEADER OVERRIDE
-================================= */
-
-.logo-text{
-    font-size:30px !important;
-    line-height:1 !important;
-}
-
-.logo-mark{
-    font-size:20px !important;
-}
-
-.header-user-email{
-    padding:6px 12px !important;
-    font-size:13px !important;
-    max-width:190px !important;
-}
-
-.badge{
-    min-width:110px !important;
-    height:34px !important;
-    font-size:13px !important;
-}
-
-.logout-btn{
-    min-width:110px !important;
-    height:34px !important;
-    font-size:13px !important;
-}
-
-.header-actions{
-    gap:6px !important;
-}
-
-/* =================================
-  MOBILE HEADER FIX
-================================= */
-
-@media (max-width: 900px){
-
-   .app-header{
-       flex-direction:column;
-       align-items:flex-start;
-       gap:14px;
-   }
-
-   .header-left{
-       width:100%;
-   }
-
-   .header-right{
-       width:100%;
-       justify-content:space-between;
-   }
-
-   .logo-text{
-       font-size:28px !important;
-   }
-
-   .header-user-email{
-       max-width:180px !important;
-       font-size:12px !important;
-   }
-
-   .badge,
-   .logout-btn{
-       min-width:100px !important;
-       height:32px !important;
-       font-size:12px !important;
-   }
-
-}
-
-/* =================================
-   FINAL HEADER POLISH
-================================= */
-
-.app-header{
-    padding:10px 20px !important;
-    min-height:auto !important;
-    gap:10px !important;
-}
-
-/* BUTTON COLUMN */
-.header-actions{
-    gap:4px !important;
-}
-
-/* PREMIUM + LOGOUT */
-.badge,
-.logout-btn{
-    width:58px !important;
-    height:22px !important;
-    min-width:80px !important;
-
-    font-size:10px !important;
-    font-weight:700 !important;
-
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-
-    padding:0 !important;
-    margin:0 !important;
-}
-
-/* EMAIL */
-.header-user-email{
-    padding:5px 12px !important;
-    font-size:12px !important;
-    margin-top:2px !important;
-}
-
-/* LOGO */
-.logo-text{
-    font-size:26px !important;
-}
-
-.logo-mark{
-    font-size:18px !important;
-}
-
-/* MOVE BUTTONS UP */
-.header-actions{
-    position:relative;
-    top:-5px !important; 
-}
-
-.header-actions{
-    position: relative !important;
-    transform: translateY(-8px) !important;
-}
-
-/* HEADER TRAFFIC LAYER */
-
-.app-header{
-    position:relative;
-    overflow:hidden;
-}
-
-/* TRAFFIC */
-.traffic{
-    position:absolute;
-
-    right:-150px;
-    top:58px;
-
-    z-index:2;
-
-    opacity:0.65;
-    font-size:18px;
-
-    pointer-events:none;
-
-    animation:driveAcross 18s linear infinite;
-}
-
-/* KEEP UI ABOVE VEHICLES */
-.header-left,
-.header-right{
-    position:relative;
-    z-index:5;
-}
-
-/* LANES */
-.car-traffic{
-    top:88px;
-    animation-delay:6s;
-}
-
-.van-traffic{
-    top:88px;
-    animation-delay:0s;
-}
-
-.lorry-traffic{
-    top:88px;
-    animation-delay:12s;
-}
-
-/* DRIVE ANIMATION */
-@keyframes driveAcross{
-
-    from{
-        transform:translateX(0);
-    }
-
-    to{
-        transform:translateX(-1600px);
-    }
 
 }

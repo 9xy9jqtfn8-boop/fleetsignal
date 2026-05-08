@@ -22,20 +22,36 @@
 
     <!-- HEADER -->
     <header class="app-header">
+
+    <div class="traffic car-traffic">🚗</div>
+    <div class="traffic van-traffic">🚐</div>
+    <div class="traffic lorry-traffic">🚚</div>
+    
       <div class="header-left">
         <span class="logo-mark">🚗</span>
         <span class="logo-text">FleetSignal</span>
       </div>
 
       <div class="header-right">
-    <span id="headerUserEmail" class="header-user-email"></span>
 
-    <span id="headerPlanBadge" class="badge free">FREE</span>
-
-    <button id="logoutBtn" class="logout-btn" type="button">Logout</button>
+  <div class="header-user-email">
+    <span id="headerUserEmail"></span>
   </div>
-    </header>
 
+  <div class="header-actions">
+
+  <span id="headerPlanBadge" class="badge free">
+    FREE
+  </span>
+
+  <button id="logoutBtn" class="logout-btn" type="button">
+    Logout
+  </button>
+
+</div>
+
+    </header>
+   
     <main class="app-content">
 
       <!-- LOGIN -->
@@ -89,8 +105,27 @@
           maxlength="8"
           autocomplete="off"
         />
-
+       
       </div>
+
+      <h3>Add details (optional)</h3>
+
+    <div class="vehicle-meta-grid">
+       <div class="input-group">
+        <label class="input-label">Tax Renewal Date</label>
+        <input id="taxDueDate" type="date" class="input" />
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Insurance Expiry</label>
+        <input id="insuranceInput" type="date" class="input" />
+      </div>
+
+      <input id="vehicleNameInput" type="text" placeholder="Vehicle name (optional)" />
+      <input id="vehicleTypeInput" type="text" placeholder="Type (Car / Van / etc)" />
+      <input id="vehicleColourInput" type="text" placeholder="Colour" />
+
+    </div>
 
       <!-- BUTTON -->
       <button id="checkBtn" class="check-btn">
@@ -107,26 +142,6 @@
 
   <!-- DETAILS -->
   <div id="detailsSection" class="card">
-
-    <h3>Add details (optional)</h3>
-
-    <div class="vehicle-meta-grid">
-
-      <input id="vehicleNameInput" type="text" placeholder="Vehicle name (optional)" />
-      <input id="vehicleTypeInput" type="text" placeholder="Type (Car / Van / etc)" />
-      <input id="vehicleColourInput" type="text" placeholder="Colour" />
-
-      <div class="input-group">
-        <label class="input-label">Tax Renewal Date</label>
-        <input id="taxDueDate" type="date" class="input" />
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Insurance Expiry</label>
-        <input id="insuranceInput" type="date" class="input" />
-      </div>
-
-    </div>
   </div>
 
   <!-- ALERTS -->
@@ -204,5 +219,10 @@
   </div>
 
   <script src="app.js"></script>
+
+  <footer class="site-footer">
+  © 2026 FleetSignal. All rights reserved.
+</footer>
+
 </body>
 </html>
