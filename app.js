@@ -593,7 +593,10 @@ await client
         <div class="vehicle-left">
           <div class="vehicle-icon">${icon}</div>
           <div>
-            <div class="vehicle-reg">${v.reg}</div>
+           <div class="saved-reg-plate">
+            <span class="gb-badge"></span>
+            <span class="reg-text">${v.reg}</span>
+          </div> 
             <div class="vehicle-meta">${v.make || ""} ${v.colour || ""}</div>
           </div>
         </div>

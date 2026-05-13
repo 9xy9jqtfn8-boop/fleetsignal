@@ -26,6 +26,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
 body::before {
@@ -68,27 +69,121 @@ body {
 }
 
 .app-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  height: 68px;
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background:
-    linear-gradient(135deg, rgba(15, 98, 254, 0.96), rgba(56, 189, 248, 0.96));
-  color: white;
-  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.24);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    overflow: hidden;
+    padding: 12px 18px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+
+    background:
+      linear-gradient(
+        135deg,
+        rgba(15, 98, 254, 0.96),
+        rgba(59, 130, 246, 0.92)
+      );
+
+    color: white;
+
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.24);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
 }
 
-.header-left,
 .header-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.header-actions {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 4px;
+  align-items: stretch;
+}
+
+#headerPlanBadge,
+.logout-btn {
+  width: 90px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 10px;
+  line-height: 1;
+}
+
+.header-user-email {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    min-width: 190px;
+    height: 20px;
+
+    padding: 0 18px;
+
+    border-radius: 999px;
+
+    background: rgba(255,255,255,0.14);
+
+    border: 1px solid rgba(255,255,255,0.16);
+
+    color: white;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    box-sizing: border-box;
+
+    flex-shrink: 1;
+}
+
+.header-user-email::before{
+  content:"👤";
+  font-size:10px;
+  opacity:0.9;
+}
+
+.header-left{
+  min-width:0;
+}
+
+.badge{
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:0.3px;
+}
+
+.badge.free{
+  background:rgba(255,255,255,0.18);
+  color:white;
+  border:1px solid rgba(255,255,255,0.22);
+}
+
+.badge.premium{
+  background:linear-gradient(135deg,#facc15,#f59e0b);
+  color:#111827;
+  box-shadow:0 4px 14px rgba(245,158,11,0.35);
 }
 
 .logo-mark {
@@ -97,25 +192,34 @@ body {
 }
 
 .logo-text {
-  font-size: 18px;
+  font-size: 25px;
   font-weight: 900;
   letter-spacing: -0.4px;
 }
 
-.header-user-email {
-  display: none;
-}
-
 .logout-btn {
-  border: none;
-  border-radius: 14px;
-  padding: 9px 14px;
-  background: linear-gradient(135deg, #fb7185, #ef4444);
-  color: white;
-  font-size: 13px;
-  font-weight: 900;
-  cursor: pointer;
-  box-shadow: 0 10px 20px rgba(239, 68, 68, 0.26);
+    border: none;
+    border-radius: 14px;
+
+    height: 20px;
+    min-width: 80px;
+
+    padding: 0 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(135deg, #fb7185, #ef4444);
+
+    color: white;
+
+    font-size: 13px;
+    font-weight: 900;
+
+    cursor: pointer;
+
+    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.26);
 }
 
 .logout-btn:active {
@@ -1385,6 +1489,30 @@ input:checked + .slider:before {
   margin-top: 14px;
 }
 
+.logged-in-bar{
+  margin:12px 16px 0;
+  padding:10px 14px;
+
+  background:rgba(255,255,255,0.72);
+
+  border-radius:14px;
+
+  font-size:13px;
+  font-weight:700;
+
+  color:#111827;
+
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+
+  box-shadow:
+    0 4px 18px rgba(0,0,0,0.06);
+}
+
+#dashboardUserEmail{
+  color:#0072ff;
+}
+
 /* =========================
    PERFECT NUMBER PLATE
 ========================= */
@@ -1512,4 +1640,1015 @@ input:checked + .slider:before {
 
 button {
   cursor: pointer;
+}
+
+/* =========================
+   FINAL SAFE OVERRIDES
+   KEEP ORIGINAL PREMIUM UI
+========================= */
+
+/* keep page width stable */
+.app-shell {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.container,
+.reg-hero {
+  width: 100%;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* prevent old duplicate padding problems */
+.container {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* =========================
+   NUMBER PLATE FINAL FIX
+========================= */
+
+.plate-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 64px;
+  padding: 6px 8px;
+
+  background: #ffda44;
+  border: 3px solid #111;
+  border-radius: 8px;
+
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.25),
+    inset 0 2px 0 rgba(255,255,255,0.4);
+
+  overflow: hidden;
+}
+
+/* smaller UK badge */
+.plate-uk {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 34px;
+  min-width: 34px;
+  height: 42px;
+
+  padding: 3px 4px;
+  margin: 0;
+
+  border-radius: 5px;
+  background: #1e3a8a;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.uk-flag {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.uk-text {
+  font-size: 9px;
+  font-weight: 700;
+}
+
+/* centre registration without badge clipping */
+.plate-wrapper input,
+#regInput {
+  width: 100%;
+  padding: 0 42px !important;
+  margin: 0 !important;
+
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  text-align: center;
+  font-size: clamp(24px, 7vw, 34px);
+  font-weight: 900;
+  letter-spacing: 4px;
+
+  color: #111;
+  outline: none;
+  text-transform: uppercase;
+  font-family: "Arial Black", Arial, sans-serif;
+}
+
+/* =========================
+   VEHICLE CARD RESTORE
+========================= */
+
+.vehicle-card {
+  position: relative;
+  overflow: hidden;
+
+  padding: 17px;
+  border-radius: 24px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,250,252,0.92));
+
+  border: 1px solid rgba(255,255,255,0.72);
+
+  box-shadow:
+    0 14px 34px rgba(15, 23, 42, 0.10),
+    inset 0 1px 0 rgba(255,255,255,0.75);
+
+  animation: fadeSlideUp 0.34s ease forwards;
+  opacity: 1;
+}
+
+.vehicle-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 6px;
+  border-radius: 0 10px 10px 0;
+}
+
+.vehicle-card.green::before {
+  background: linear-gradient(180deg, #22c55e, #86efac);
+}
+
+.vehicle-card.yellow::before,
+.vehicle-card.orange::before {
+  background: linear-gradient(180deg, #f59e0b, #fde68a);
+}
+
+.vehicle-card.red::before {
+  background: linear-gradient(180deg, #ef4444, #fca5a5);
+}
+
+/* keep card layout as before */
+.vehicle-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.vehicle-left {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+
+.vehicle-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 16px;
+  background: rgba(37, 99, 235, 0.08);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 23px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+}
+
+.vehicle-reg {
+  font-size: 23px;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: #1d4ed8;
+}
+
+.vehicle-meta {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.vehicle-status {
+  margin-top: 15px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* =========================
+   MOBILE CARD SAFETY
+========================= */
+
+@media (max-width: 480px) {
+  .vehicle-reg {
+    font-size: 20px;
+  }
+
+  .plate-wrapper input,
+  #regInput {
+    font-size: clamp(22px, 7vw, 30px);
+    letter-spacing: 3px;
+  }
+}
+
+/* ===== PLAN BADGE ===== */
+.badge {
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.badge.free {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+
+.badge.premium {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  box-shadow: 0 0 8px rgba(34,197,94,0.6);
+}
+
+.logged-in-bar{
+  display:block !important;
+}
+
+.scroll-down{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  margin:28px auto 10px;
+
+  width:54px;
+  height:54px;
+
+  border-radius:50%;
+
+  background:linear-gradient(135deg,#00c6ff,#0072ff);
+
+  color:white;
+
+  font-size:28px;
+  font-weight:900;
+
+  box-shadow:
+    0 10px 30px rgba(0,114,255,0.25);
+
+  animation:bounceArrow 2s infinite;
+}
+
+@keyframes bounceArrow{
+
+  0%,20%,50%,80%,100%{
+    transform:translateY(0);
+  }
+
+  40%{
+    transform:translateY(10px);
+  }
+
+  60%{
+    transform:translateY(5px);
+  }
+}
+
+/* =========================================================
+   FLEETSIGNAL UI LAYER v2
+   SAFE VISUAL POLISH ONLY
+   (NON-DESTRUCTIVE)
+========================================================= */
+
+/* =========================================================
+   GLOBAL PREMIUM SMOOTHING
+========================================================= */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* softer overall rendering */
+* {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* =========================================================
+   FLOATING BACKGROUND GLOWS
+========================================================= */
+
+body::after {
+  content: "";
+
+  position: fixed;
+
+  top: -20%;
+  right: -20%;
+
+  width: 500px;
+  height: 500px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(56,189,248,0.12),
+      transparent 70%
+    );
+
+  pointer-events: none;
+  z-index: -1;
+
+  filter: blur(40px);
+}
+
+/* =========================================================
+   APP SHELL PREMIUM DEPTH
+========================================================= */
+
+.app-shell {
+
+  position: relative;
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+}
+
+/* =========================================================
+   PREMIUM HEADER ENHANCEMENT
+========================================================= */
+
+.app-header {
+
+  border-bottom:
+    1px solid rgba(255,255,255,0.18);
+
+  box-shadow:
+    0 12px 40px rgba(37,99,235,0.18);
+
+}
+
+/* floating glass feel */
+.app-header::after {
+
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,0.6),
+      transparent
+    );
+
+}
+
+/* =========================================================
+   LOGGED IN BAR
+========================================================= */
+
+.logged-in-bar {
+
+  border:
+    1px solid rgba(255,255,255,0.5);
+
+  background:
+    rgba(255,255,255,0.65);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+}
+
+/* =========================================================
+   CARD VISUAL UPGRADE
+   (SAFE — NO SIZE CHANGES)
+========================================================= */
+
+.card {
+
+  position: relative;
+
+  overflow: hidden;
+
+}
+
+/* soft premium reflection */
+.card::before {
+
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: -120%;
+
+  width: 80%;
+  height: 100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,0.18),
+      transparent
+    );
+
+  transform: skewX(-18deg);
+
+  pointer-events: none;
+
+}
+
+/* =========================================================
+   BUTTON PREMIUM EFFECTS
+========================================================= */
+
+.primary-btn,
+.check-btn,
+.upgrade-btn {
+
+  position: relative;
+  overflow: hidden;
+
+}
+
+/* glossy button sweep */
+.primary-btn::before,
+.check-btn::before,
+.upgrade-btn::before {
+
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: -120%;
+
+  width: 80%;
+  height: 100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,0.28),
+      transparent
+    );
+
+  transform: skewX(-20deg);
+
+}
+
+/* desktop hover only */
+@media (hover:hover) {
+
+  .primary-btn:hover::before,
+  .check-btn:hover::before,
+  .upgrade-btn:hover::before {
+
+    left: 140%;
+    transition: 0.8s ease;
+
+  }
+
+}
+
+/* =========================================================
+   PREMIUM INPUTS
+========================================================= */
+
+input {
+
+  transition:
+    border 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+
+}
+
+/* subtle lift */
+input:focus {
+
+  transform: translateY(-1px);
+
+}
+
+/* =========================================================
+   HERO FLOAT
+========================================================= */
+
+.reg-card {
+
+  animation:
+    softFloat 5s ease-in-out infinite;
+
+}
+
+@keyframes softFloat {
+
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+
+}
+
+/* =========================================================
+   PREMIUM BOTTOM NAV
+========================================================= */
+
+.bottom-nav {
+
+  border:
+    1px solid rgba(255,255,255,0.45);
+
+}
+
+/* =========================================================
+   NAV ICON POLISH
+========================================================= */
+
+.nav-item span {
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+
+}
+
+.nav-item.active span {
+
+  transform: scale(1.08);
+
+}
+
+/* =========================================================
+   SCROLLBAR POLISH
+========================================================= */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+
+  background:
+    rgba(255,255,255,0.4);
+
+}
+
+::-webkit-scrollbar-thumb {
+
+  background:
+    linear-gradient(
+      180deg,
+      #60a5fa,
+      #2563eb
+    );
+
+  border-radius: 999px;
+
+}
+
+/* =========================================================
+   DESKTOP POLISH
+========================================================= */
+
+@media (min-width: 900px) {
+
+  .app-shell {
+
+    margin-top: 28px;
+    margin-bottom: 28px;
+
+    border-radius: 34px;
+
+    overflow: hidden;
+
+    box-shadow:
+      0 30px 80px rgba(15,23,42,0.16);
+
+  }
+
+}
+
+/* =========================================================
+   SAFE PERFORMANCE
+========================================================= */
+
+.vehicle-card,
+.status-pill,
+.delete-btn {
+
+  will-change: transform;
+
+}
+
+/* =========================
+   FLOATING HEADER TRAFFIC
+========================= */
+
+.traffic{
+position:absolute;
+font-size:20px;
+opacity:0.22;
+pointer-events:none;
+z-index:0;
+}
+
+/* CAR */
+.car-traffic{
+top:6px;
+right:-120px;
+animation:trafficCar 18s linear infinite;
+}
+
+/* VAN */
+.van-traffic{
+top:24px;
+right:-320px;
+animation:trafficVan 24s linear infinite;
+}
+
+/* LORRY */
+.lorry-traffic{
+top:12px;
+right:-520px;
+animation:trafficLorry 30s linear infinite;
+}
+
+/* ANIMATIONS */
+
+@keyframes trafficCar{
+from{
+transform:translateX(0);
+}
+to{
+transform:translateX(-1600px);
+}
+}
+
+@keyframes trafficVan{
+from{
+transform:translateX(0);
+}
+to{
+transform:translateX(-1600px);
+}
+}
+
+@keyframes trafficLorry{
+from{
+transform:translateX(0);
+}
+to{
+transform:translateX(-1600px);
+}
+}
+
+/* =========================
+   SITE FOOTER
+========================= */
+
+.site-footer{
+
+  text-align:center;
+
+  padding:24px 16px 110px;
+
+  font-size:12px;
+
+  font-weight:600;
+
+  color:#94a3b8;
+
+  opacity:0.9;
+
+}
+
+/* HEADER RIGHT SIDE */
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    margin-left:auto;
+}
+
+/* EMAIL PILL */
+.header-user-email{
+    padding:10px 18px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(10px);
+    color:white;
+    font-weight:600;
+    font-size:15px;
+    white-space:nowrap;
+}
+
+/* BUTTON STACK */
+.header-actions{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+/* MATCH BUTTON SIZES */
+.badge,
+.logout-btn{
+    min-width:140px;
+    height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:999px;
+    font-weight:700;
+}
+
+/* =================================
+   HEADER SIZE FIX
+================================= */
+
+.app-header{
+    padding: 8px 16px;
+    min-height: 82px;
+}
+
+/* LEFT SIDE */
+.header-left{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.logo-mark{
+    font-size:24px;
+}
+
+.logo-text{
+    font-size:38px;
+    line-height:1;
+    margin-top:2px;
+}
+
+/* RIGHT SIDE */
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-left:auto;
+}
+
+/* EMAIL */
+.header-user-email{
+    padding:8px 14px;
+    font-size:14px;
+    max-width:240px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* BUTTON COLUMN */
+.header-actions{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+/* BUTTONS */
+.badge,
+.logout-btn{
+    min-width:120px;
+    height:36px;
+    font-size:14px;
+    border-radius:999px;
+}
+
+/* =================================
+   FINAL HEADER OVERRIDE
+================================= */
+
+.logo-text{
+    font-size:30px !important;
+    line-height:1 !important;
+}
+
+.logo-mark{
+    font-size:20px !important;
+}
+
+.header-user-email{
+    padding:6px 12px !important;
+    font-size:13px !important;
+    max-width:190px !important;
+}
+
+.badge{
+    min-width:110px !important;
+    height:34px !important;
+    font-size:13px !important;
+}
+
+.logout-btn{
+    min-width:110px !important;
+    height:34px !important;
+    font-size:13px !important;
+}
+
+.header-actions{
+    gap:6px !important;
+}
+
+/* =================================
+  MOBILE HEADER FIX
+================================= */
+
+@media (max-width: 900px){
+
+   .app-header{
+       flex-direction:column;
+       align-items:flex-start;
+       gap:14px;
+   }
+
+   .header-left{
+       width:100%;
+   }
+
+   .header-right{
+       width:100%;
+       justify-content:space-between;
+   }
+
+   .logo-text{
+       font-size:28px !important;
+   }
+
+   .header-user-email{
+       max-width:180px !important;
+       font-size:12px !important;
+   }
+
+   .badge,
+   .logout-btn{
+       min-width:100px !important;
+       height:32px !important;
+       font-size:12px !important;
+   }
+
+}
+
+/* =================================
+   FINAL HEADER POLISH
+================================= */
+
+.app-header{
+    padding:10px 20px !important;
+    min-height:auto !important;
+    gap:10px !important;
+}
+
+/* BUTTON COLUMN */
+.header-actions{
+    gap:4px !important;
+}
+
+/* PREMIUM + LOGOUT */
+.badge,
+.logout-btn{
+    width:58px !important;
+    height:22px !important;
+    min-width:80px !important;
+
+    font-size:10px !important;
+    font-weight:700 !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    padding:0 !important;
+    margin:0 !important;
+}
+
+/* EMAIL */
+.header-user-email{
+    padding:5px 12px !important;
+    font-size:12px !important;
+    margin-top:2px !important;
+}
+
+/* LOGO */
+.logo-text{
+    font-size:26px !important;
+}
+
+.logo-mark{
+    font-size:18px !important;
+}
+
+/* MOVE BUTTONS UP */
+.header-actions{
+    position:relative;
+    top:-5px !important; 
+}
+
+.header-actions{
+    position: relative !important;
+    transform: translateY(-8px) !important;
+}
+
+/* HEADER TRAFFIC LAYER */
+
+.app-header{
+    position:relative;
+    overflow:hidden;
+}
+
+/* TRAFFIC */
+.traffic{
+    position:absolute;
+
+    right:-150px;
+    top:58px;
+
+    z-index:2;
+
+    opacity:0.65;
+    font-size:18px;
+
+    pointer-events:none;
+
+    animation:driveAcross 18s linear infinite;
+}
+
+/* KEEP UI ABOVE VEHICLES */
+.header-left,
+.header-right{
+    position:relative;
+    z-index:5;
+}
+
+/* LANES */
+.car-traffic{
+    top:88px;
+    animation-delay:6s;
+}
+
+.van-traffic{
+    top:88px;
+    animation-delay:0s;
+}
+
+.lorry-traffic{
+    top:88px;
+    animation-delay:12s;
+}
+
+/* DRIVE ANIMATION */
+@keyframes driveAcross{
+
+    from{
+        transform:translateX(0);
+    }
+
+    to{
+        transform:translateX(-1600px);
+    }
+
 }
