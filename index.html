@@ -1,306 +1,325 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FleetSignal</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FleetSignal</title>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0072ff">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0072ff">
 
-<style>
+  <style>
+    /* BASE */
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(180deg, #eef4ff, #f7f9fc);
+      -webkit-font-smoothing: antialiased;
+    }
 
-/* BASE */
-body {
- margin:0;
- font-family:-apple-system,BlinkMacSystemFont,sans-serif;
- background:linear-gradient(180deg,#eef4ff,#f7f9fc);
- -webkit-font-smoothing: antialiased;
-}
+    /* HEADER */
+    .header {
+      text-align: center;
+      padding: 20px;
+      font-weight: 600;
+      font-size: 22px;
+      background: linear-gradient(90deg, #0072ff, #00c6ff);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(0, 114, 255, 0.25);
+    }
 
-/* HEADER */
-.header {
- text-align:center;
- padding:20px;
- font-weight:600;
- font-size:22px;
- background:linear-gradient(90deg,#0072ff,#00c6ff);
- color:#fff;
- box-shadow:0 4px 20px rgba(0,114,255,0.25);
-}
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 70px 20px 40px;
+      animation: fadeUp 0.8s ease;
+    }
 
-/* HERO */
-.hero {
- text-align:center;
- padding:70px 20px 40px;
- animation:fadeUp 0.8s ease;
-}
-
-/* =========================
+    /* =========================
   PREVIEW CARD (ULTRA)
 ========================= */
 
-.preview {
- max-width:320px;
- margin:0 auto 30px;
- border-radius:26px;
- overflow:visible;
- height:230px;
- padding:10px;
- 
- background:rgba(255,255,255,0.6);
- backdrop-filter:blur(14px);
+    .preview {
+      max-width: 320px;
+      margin: 0 auto 30px;
+      border-radius: 26px;
+      overflow: visible;
+      height: 230px;
+      padding: 10px;
 
- box-shadow:
-   0 25px 60px rgba(0,0,0,0.12),
-   inset 0 1px 0 rgba(255,255,255,0.6);
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(14px);
 
- position:relative;
-}
+      box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
 
-/* GLOW */
-.preview::before {
- content:"";
- position:absolute;
- inset:-40px;
- background:radial-gradient(circle at center, rgba(0,120,255,0.15), transparent 70%);
- z-index:0;
-}
+      position: relative;
+    }
 
-/* IMAGE */
-.preview img {
- width:100%;
- height:100%;
- object-fit:contain;
+    /* GLOW */
+    .preview::before {
+      content: "";
+      position: absolute;
+      inset: -40px;
+      background: radial-gradient(circle at center, rgba(0, 120, 255, 0.15), transparent 70%);
+      z-index: 0;
+    }
 
- position:relative;
- z-index:1;
+    /* IMAGE */
+    .preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
 
- opacity:0;
- transform:scale(0.97);
+      position: relative;
+      z-index: 1;
 
- transition:opacity 0.6s ease, transform 0.6s ease;
-}
+      opacity: 0;
+      transform: scale(0.97);
 
-/* LOADED */
-.preview img.loaded {
- opacity:1;
- transform:scale(1);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
 
- animation:float 5s ease-in-out infinite;
-}
+    /* LOADED */
+    .preview img.loaded {
+      opacity: 1;
+      transform: scale(1);
 
-/* FLOAT */
-@keyframes float {
- 0% { transform: translateY(0px); }
- 50% { transform: translateY(-10px); }
- 100% { transform: translateY(0px); }
-}
+      animation: float 5s ease-in-out infinite;
+    }
 
-/* TEXT */
-h1 {
- font-size:34px;
- margin:30px 0 10px;
- letter-spacing:-0.5px;
-}
+    /* FLOAT */
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
 
-.sub {
- opacity:0.65;
- max-width:420px;
- margin:0 auto 30px;
- font-size:15px;
- line-height:1.5;
-}
+      50% {
+        transform: translateY(-10px);
+      }
 
-/* CTA BUTTON */
-.cta {
- display:inline-block;
- padding:16px 34px;
- border-radius:16px;
+      100% {
+        transform: translateY(0px);
+      }
+    }
 
- background:linear-gradient(90deg,#00c6ff,#0072ff);
- color:#f9fbff;
+    /* TEXT */
+    h1 {
+      font-size: 34px;
+      margin: 30px 0 10px;
+      letter-spacing: -0.5px;
+    }
 
- font-weight:600;
- font-size:15px;
+    .sub {
+      opacity: 0.65;
+      max-width: 420px;
+      margin: 0 auto 30px;
+      font-size: 15px;
+      line-height: 1.5;
+    }
 
- text-decoration:none;
+    /* CTA BUTTON */
+    .cta {
+      display: inline-block;
+      padding: 16px 34px;
+      border-radius: 16px;
 
- box-shadow:
-   0 12px 30px rgba(0,120,255,0.35),
-   inset 0 1px 0 rgba(255,255,255,0.4);
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: #f9fbff;
 
- transition:all 0.25s ease;
-}
+      font-weight: 600;
+      font-size: 15px;
 
-/* HOVER */
-.cta:hover {
- transform:translateY(-3px) scale(1.02);
- box-shadow:
-   0 18px 40px rgba(0,120,255,0.45),
-   inset 0 1px 0 rgba(255,255,255,0.5);
-}
+      text-decoration: none;
 
-/* TRUST TEXT */
-.trust {
- margin-top:14px;
- font-size:13px;
- opacity:0.5;
-}
+      box-shadow:
+        0 12px 30px rgba(0, 120, 255, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
 
-/* FEATURES */
-.features {
- max-width:520px;
- margin:50px auto;
- padding:0 20px;
-}
+      transition: all 0.25s ease;
+    }
 
-/* CARD */
-.feature {
- background:rgba(255,255,255,0.75);
- backdrop-filter:blur(14px);
+    /* HOVER */
+    .cta:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow:
+        0 18px 40px rgba(0, 120, 255, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
 
- border-radius:20px;
- padding:20px;
+    /* TRUST TEXT */
+    .trust {
+      margin-top: 14px;
+      font-size: 13px;
+      opacity: 0.5;
+    }
 
- margin-bottom:16px;
+    /* FEATURES */
+    .features {
+      max-width: 520px;
+      margin: 50px auto;
+      padding: 0 20px;
+    }
 
- box-shadow:
-   0 12px 30px rgba(0,0,0,0.06),
-   inset 0 1px 0 rgba(255,255,255,0.5);
+    /* CARD */
+    .feature {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(14px);
 
- transition:all 0.25s ease;
-}
+      border-radius: 20px;
+      padding: 20px;
 
-/* HOVER */
-.feature:hover {
- transform:translateY(-4px);
- box-shadow:
-   0 20px 50px rgba(0,0,0,0.08);
-}
+      margin-bottom: 16px;
 
-/* TEXT */
-.feature strong {
- display:block;
- font-size:16px;
- margin-bottom:4px;
-}
+      box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
 
-.feature {
- font-size:14px;
- opacity:0.85;
-}
+      transition: all 0.25s ease;
+    }
 
-/* FADE IN */
-@keyframes fadeUp {
- from {opacity:0; transform:translateY(25px);}
- to {opacity:1; transform:translateY(0);}
-}
+    /* HOVER */
+    .feature:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.08);
+    }
 
-.scroll-down{
-  display:flex;
-  justify-content:center;
-  align-items:center;
+    /* TEXT */
+    .feature strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
 
-  margin:28px auto 10px;
+    .feature {
+      font-size: 14px;
+      opacity: 0.85;
+    }
 
-  width:54px;
-  height:54px;
+    /* FADE IN */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(25px);
+      }
 
-  border-radius:50%;
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-  background:linear-gradient(135deg,#00c6ff,#0072ff);
+    .scroll-down {
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-  color:#0071ff;
+      margin: 28px auto 10px;
 
-  font-size:28px;
-  font-weight:900;
+      width: 54px;
+      height: 54px;
 
-  box-shadow:
-    0 10px 30px rgba(0,114,255,0.25);
+      border-radius: 50%;
 
-  animation:bounceArrow 2s infinite;
-}
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
 
-@keyframes bounceArrow{
+      color: #0071ff;
 
-  0%,20%,50%,80%,100%{
-    transform:translateY(0);
-  }
+      font-size: 28px;
+      font-weight: 900;
 
-  40%{
-    transform:translateY(10px);
-  }
+      box-shadow:
+        0 10px 30px rgba(0, 114, 255, 0.25);
 
-  60%{
-    transform:translateY(5px);
-  }
-}
+      animation: bounceArrow 2s infinite;
+    }
 
-</style>
+    @keyframes bounceArrow {
+
+      0%,
+      20%,
+      50%,
+      80%,
+      100% {
+        transform: translateY(0);
+      }
+
+      40% {
+        transform: translateY(10px);
+      }
+
+      60% {
+        transform: translateY(5px);
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="header">🚗 FleetSignal</div>
+  <div class="header">🚗 FleetSignal</div>
 
-<div class="hero">
+  <div class="hero">
 
- <div class="preview">
-   <img src="fleet-visual.png?v=2">
- </div>
+    <div class="preview">
+      <img src="fleet-visual.png?v=2">
+    </div>
 
- <h1>Never Miss an MOT Again</h1>
+    <h1>Never Miss an MOT Again</h1>
 
- <p class="sub">
-   Stay road-legal without thinking about it.  
-   Track MOT, tax and vehicle status instantly.
- </p>
+    <p class="sub">
+      Stay road-legal without thinking about it.
+      Track MOT, tax and vehicle status instantly.
+    </p>
 
- <a href="app.html" class="cta">Check My Vehicles</a>
+    <a href="app.html" class="cta">Check My Vehicles</a>
 
- <div class="trust">
-  No signup stress — No spam — Just simple tracking
-</div>
+    <div class="trust">
+      No signup stress — No spam — Just simple tracking
+    </div>
 
-<div class="scroll-down">
-  ↓
-</div>
+    <div class="scroll-down">
+      ↓
+    </div>
 
-</div>
+  </div>
 
-<div class="features">
- <div class="feature"><strong>✅ Instant MOT Checks</strong>Live DVLA data instantly.</div>
- <div class="feature"><strong>🚗 Track Vehicles</strong>All vehicles in one place.</div>
- <div class="feature"><strong>🔔 Smart Alerts</strong>Never miss expiry again.</div>
- <div class="feature"><strong>📱 App Experience</strong>Add to home screen.</div>
-</div>
+  <div class="features">
+    <div class="feature"><strong>✅ Instant MOT Checks</strong>Live DVLA data instantly.</div>
+    <div class="feature"><strong>🚗 Track Vehicles</strong>All vehicles in one place.</div>
+    <div class="feature"><strong>🔔 Smart Alerts</strong>Never miss expiry again.</div>
+    <div class="feature"><strong>📱 App Experience</strong>Add to home screen.</div>
+  </div>
 
-<script>
-document.querySelectorAll('.preview img').forEach(img => {
- if (img.complete) {
-   setTimeout(() => img.classList.add('loaded'), 150);
- } else {
-   img.onload = () => {
-     setTimeout(() => img.classList.add('loaded'), 150);
-   };
- }
-});
-</script>
+  <script>
+    document.querySelectorAll('.preview img').forEach(img => {
+      if (img.complete) {
+        setTimeout(() => img.classList.add('loaded'), 150);
+      } else {
+        img.onload = () => {
+          setTimeout(() => img.classList.add('loaded'), 150);
+        };
+      }
+    });
+  </script>
 
-<footer class="footer-links">
+  <footer class="footer-links">
 
-  <a href="privacy.html">Privacy</a>
+    <a href="privacy.html">Privacy</a>
 
-  <a href="terms.html">Terms</a>
+    <a href="terms.html">Terms</a>
 
-  <a href="refunds.html">Refunds</a>
+    <a href="refunds.html">Refunds</a>
 
-  <p class="copyright">
-  © 2026 FleetSignal. All rights reserved.
-  </p>
+    <p class="copyright">
+      © 2026 FleetSignal. All rights reserved.
+    </p>
 
-</footer>
+  </footer>
 
 </body>
+
 </html>
