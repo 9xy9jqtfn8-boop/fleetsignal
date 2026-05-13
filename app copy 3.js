@@ -254,12 +254,12 @@ try {
     alertsToggle.disabled = false;
     alertsToggle.checked = !!alertsEnabled;
 
-     updateAlertText();
-
     const alertEmailInput = document.getElementById("alertEmailInput");
     if (alertEmailInput) {
       alertEmailInput.disabled = false;
     }
+
+    updateAlertText();
   }
 }
 
