@@ -201,19 +201,61 @@
 
       <!-- ALERTS VIEW -->
       <section id="alertsView" class="container hidden">
-        <div class="card">
-          <h2>Alerts</h2>
-          <p>Your MOT reminders will appear here.</p>
-        </div>
-      </section>
+
+  <div class="card">
+    <h2>🚨 Fleet Alerts</h2>
+    <p class="section-subtitle">
+      Important MOT, TAX and Insurance reminders.
+    </p>
+
+    <div id="alertsList" class="alerts-list">
+
+      <div class="alert-empty">
+        No active alerts right now.
+      </div>
+
+    </div>
+  </div>
+
+</section>
 
       <!-- SETTINGS VIEW -->
       <section id="settingsView" class="container hidden">
-        <div class="card">
-          <h2>Settings</h2>
-          <p>Manage your account and preferences.</p>
-        </div>
-      </section>
+
+ <div class="card">
+   <h2>⚙️ Settings</h2>
+   <p class="section-subtitle">
+     Manage your FleetSignal account and alert preferences.
+   </p>
+
+   <div class="settings-list">
+
+     <div class="settings-card">
+       <strong>Account</strong>
+       <span id="settingsUserEmail">Signed in user will appear here</span>
+     </div>
+
+     <div class="settings-card">
+       <strong>Plan</strong>
+       <span id="settingsPlanStatus">Checking plan status...</span>
+     </div>
+
+     <div class="settings-card">
+       <strong>Alert email</strong>
+       <span id="settingsAlertEmail">Uses your saved alert email address.</span>
+     </div>
+
+     <div class="settings-card">
+       <strong>Compliance reminder</strong>
+       <span>
+         Reminders are provided as a convenience only. You remain responsible for keeping vehicles compliant.
+       </span>
+     </div>
+
+   </div>
+ </div>
+
+</section>
 
     </main>
 

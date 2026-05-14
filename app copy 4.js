@@ -263,11 +263,22 @@ try {
   }
 }
 
+  function showView(viewId) {
+  const views = ["vehiclesView", "alertsView", "settingsView"];
+
+  views.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add("hidden");
+  });
+
+  const active = document.getElementById(viewId);
+  if (active) active.classList.remove("hidden");
+}
+
   showView("vehiclesView");
   
   loadVehicles();
-  updateSettingsView();
-} 
+}
 
 // =======================
 // AUTH
@@ -432,7 +443,6 @@ async function forgotPasswordHandler(e) {
 
     // reload vehicles
     loadVehicles();
-    updateSettingsView();
 
   } catch (err) {
     console.error(err);
@@ -491,12 +501,6 @@ async function loadVehicles() {
 
   list.innerHTML = "";
 
-  const alertsList = document.getElementById("alertsList");
-
-if (alertsList) {
-  alertsList.innerHTML = "";
-}
-
   const { data: { user } } = await client.auth.getUser();
 
   if (!user) {
@@ -511,8 +515,6 @@ if (alertsList) {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-    console.log(data);
-    
   if (error || !data || data.length === 0) {
     list.innerHTML = "<p>No vehicles</p>";
     isLoadingVehicles = false;
@@ -550,44 +552,18 @@ if (alertsList) {
 
     if (canSendAlert && v.alerts_enabled && v.alert_email) {
        try {
-       let alertType = "MOT";
-
-if (insuranceDays != null && insuranceDays <= 30) {
-  alertType = "Insurance";
-}
-
-if (taxDays != null && taxDays <= 30) {
-  alertType = "Tax";
-}
-
-if (
-  v.mot_days != null &&
-  taxDays != null &&
-  insuranceDays != null &&
-  v.mot_days <= 30 &&
-  taxDays <= 30 &&
-  insuranceDays <= 30
-) {
-  alertType = "Vehicle Compliance";
-} 
     const res = await fetch("/api/sendAlert", {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
   },
- body: JSON.stringify({
- reg: v.reg,
- email: v.alert_email,
-
- motDays: v.mot_days,
- taxStatus: v.tax_status,
-insuranceExpiry:
- insuranceDays != null
-   ? `${insuranceDays} days remaining`
-   : "Not added",
- make: v.make,
- alertType
-})
+  body: JSON.stringify({
+    reg: v.reg,
+    email: v.alert_email,
+    mot_days: v.mot_days,
+    tax_days: taxDays,
+    insurance_days: insuranceDays
+  })
 });
 
 if (!res.ok) {
@@ -659,167 +635,12 @@ await client
     row.querySelector(".delete-btn").onclick = async () => {
       await client.from("vehicles").delete().eq("id", v.id);
       loadVehicles();
-      updateSettingsView();
     };
 
     list.appendChild(row);
   }
-  
-  buildAlertsPanel(data);
 
   isLoadingVehicles = false;
-}
-
-// ===============================
-// UPDATE SETTINGS VIEW
-// ===============================
-
-async function updateSettingsView() {
-  const settingsUserEmail = document.getElementById("settingsUserEmail");
-  const settingsPlanStatus = document.getElementById("settingsPlanStatus");
-  const settingsAlertEmail = document.getElementById("settingsAlertEmail");
-
-  const { data: { user } } = await client.auth.getUser();
-
-  if (!user) return;
-
-  if (settingsUserEmail) {
-    settingsUserEmail.textContent = user.email;
-  }
-
-  const { data: profile } = await client
-    .from("profiles")
-    .select("is_premium")
-    .eq("id", user.id)
-    .single();
-
-  if (settingsPlanStatus) {
-    settingsPlanStatus.textContent = profile?.is_premium
-      ? "Premium plan active"
-      : "Free plan";
-  }
-
-  const { data: vehicles } = await client
-    .from("vehicles")
-    .select("alert_email")
-    .eq("user_id", user.id)
-    .limit(1);
-
-  if (settingsAlertEmail) {
-    settingsAlertEmail.textContent =
-      vehicles && vehicles.length > 0 && vehicles[0].alert_email
-        ? vehicles[0].alert_email
-        : user.email;
-  }
-}
-
-// ===============================
-// BUILD ALERTS PANEL
-// ===============================
-
-function buildAlertsPanel(vehicles) {
- const alertsList = document.getElementById("alertsList");
-
- if (!alertsList) return;
-
- alertsList.innerHTML = "";
-
- let hasAlerts = false;
-
- vehicles.forEach(vehicle => {
-   const reg = vehicle.reg || "Unknown vehicle";
-
-   const motDays =
-     vehicle.mot_days !== null && vehicle.mot_days !== undefined
-       ? Number(vehicle.mot_days)
-       : null;
-
-   const taxDays = vehicle.tax_due_date
-     ? Math.ceil(
-         (new Date(vehicle.tax_due_date) - new Date()) /
-           (1000 * 60 * 60 * 24)
-       )
-     : null;
-
-   const insuranceDays = vehicle.insurance_expiry
-     ? Math.ceil(
-         (new Date(vehicle.insurance_expiry) - new Date()) /
-           (1000 * 60 * 60 * 24)
-       )
-     : null;
-
-   // =========================
-   // INSURANCE ALERT
-   // =========================
-
-   if (insuranceDays !== null && insuranceDays <= 30) {
-     hasAlerts = true;
-
-     const level = insuranceDays <= 7 ? "red" : "orange";
-
-     alertsList.innerHTML += `
-       <div class="alert-card ${level}">
-         <div class="alert-title">🚨 Insurance Alert</div>
-         <div class="alert-big">${insuranceDays} days remaining</div>
-         <div class="alert-text">
-           ${reg} insurance expires soon.
-         </div>
-       </div>
-     `;
-   }
-
-   // =========================
-   // MOT ALERT
-   // =========================
-
-   if (motDays !== null && motDays <= 30) {
-     hasAlerts = true;
-
-     const level = motDays <= 7 ? "red" : "orange";
-
-     alertsList.innerHTML += `
-       <div class="alert-card ${level}">
-         <div class="alert-title">⚠️ MOT Warning</div>
-         <div class="alert-big">${motDays} days remaining</div>
-         <div class="alert-text">
-           ${reg} MOT expires soon.
-         </div>
-       </div>
-     `;
-   }
-
-   // =========================
-   // TAX ALERT
-   // =========================
-
-   if (taxDays !== null && taxDays <= 30) {
-     hasAlerts = true;
-
-     const level = taxDays <= 7 ? "red" : "orange";
-
-     alertsList.innerHTML += `
-       <div class="alert-card ${level}">
-         <div class="alert-title">📄 Tax Reminder</div>
-         <div class="alert-big">${taxDays} days remaining</div>
-         <div class="alert-text">
-           ${reg} tax renewal is approaching.
-         </div>
-       </div>
-     `;
-   }
- });
-
- // =========================
- // EMPTY STATE
- // =========================
-
- if (!hasAlerts) {
-   alertsList.innerHTML = `
-     <div class="alert-empty">
-       ✅ All vehicles are currently compliant.
-     </div>
-   `;
- }
 }
 
 // =======================
@@ -899,6 +720,17 @@ function setupButtons() {
 // =======================
 // VIEW SWITCHER (FIX)
 // =======================
+function showView(viewId) {
+  const views = ["vehiclesView", "alertsView", "settingsView"];
+
+  views.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add("hidden");
+  });
+
+  const active = document.getElementById(viewId);
+  if (active) active.classList.remove("hidden");
+}
 
 async function initApp() {
  console.log("App starting...");

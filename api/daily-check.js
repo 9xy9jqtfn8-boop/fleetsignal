@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     let sent = 0;
 
     for (const v of vehicles) {
-      const motDays = v.mot_days;
+      const motDays = Number(v.mot_days) || 0;
 
       // Only send if between 1–30 days
       if (typeof motDays !== "number" || motDays <= 0 || motDays > 30) {
@@ -57,15 +57,110 @@ export default async function handler(req, res) {
           to: v.alert_email,
           subject: `MOT Alert for ${v.reg}`,
           html: `
-            <div style="font-family: Arial; padding:20px;">
-              <h2>🚗 FleetSignal Alert</h2>
-              <p><strong>${v.reg}</strong></p>
-              <p>Your MOT expires in:</p>
-              <h1 style="color:red;">${motDays} days</h1>
-              <p>Book early to avoid fines.</p>
-            </div>
-          `,
-        });
+          <div style="
+          font-family: Arial, sans-serif;
+          background:#f4f7fb;
+          padding:40px 20px;
+        ">
+
+          <div style="
+           max-width:520px;
+           margin:auto;
+           background:white;
+           border-radius:24px;
+           padding:40px;
+           box-shadow:0 10px 30px rgba(0,0,0,0.08);
+        ">
+
+    <h1 style="
+      font-size:36px;
+      margin:0 0 10px;
+      color:#111827;
+    ">
+      🚗 FleetSignal Alert
+    </h1>
+
+    <p style="
+      color:#6b7280;
+      font-size:20px;
+      margin-bottom:30px;
+    ">
+      MOT reminder for your vehicle
+    </p>
+
+    <div style="
+      background:linear-gradient(135deg,#4f7df3,#315efb);
+      color:white;
+      padding:24px;
+      border-radius:18px;
+      margin-bottom:30px;
+    ">
+      <div style="font-size:18px; opacity:0.9;">
+        Vehicle
+      </div>
+
+      <div style="
+        font-size:42px;
+        font-weight:700;
+        letter-spacing:2px;
+      ">
+        ${v.reg}
+      </div>
+    </div>
+
+    <p style="
+      font-size:22px;
+      color:#111827;
+      margin-bottom:10px;
+    ">
+      Your MOT expires in:
+    </p>
+
+    <h2 style="
+      font-size:56px;
+      color:#ef4444;
+      margin:0 0 30px;
+    ">
+      ${motDays} days
+    </h2>
+
+    <p style="
+      color:#6b7280;
+      font-size:18px;
+      line-height:1.6;
+      margin-bottom:40px;
+    ">
+      Don’t risk fines or invalid insurance.
+      Book your MOT now to stay compliant.
+    </p>
+
+    <a href="https://www.getfleetsignal.com/app.html"
+       style="
+        display:inline-block;
+        background:#4f7df3;
+        color:white;
+        text-decoration:none;
+        padding:18px 32px;
+        border-radius:14px;
+        font-size:22px;
+        font-weight:600;
+      ">
+      Open FleetSignal
+    </a>
+
+    <p style="
+      margin-top:40px;
+      font-size:14px;
+      color:#9ca3af;
+    ">
+      FleetSignal • Smart vehicle reminders
+    </p>
+
+  </div>
+
+</div>
+`,
+});
 
         await supabase
           .from("vehicles")
