@@ -432,9 +432,22 @@ async function forgotPasswordHandler(e) {
       }
     ], { onConflict: "user_id,reg" });
 
-    // reload vehicles
-    loadVehicles();
-    updateSettingsView();
+   // Clear optional vehicle detail fields after successful save
+const taxDueDate = document.getElementById("taxDueDate");
+const insuranceInput = document.getElementById("insuranceInput");
+const vehicleNameInput = document.getElementById("vehicleNameInput");
+const vehicleTypeInput = document.getElementById("vehicleTypeInput");
+const vehicleColourInput = document.getElementById("vehicleColourInput");
+
+if (taxDueDate) taxDueDate.value = "";
+if (insuranceInput) insuranceInput.value = "";
+if (vehicleNameInput) vehicleNameInput.value = "";
+if (vehicleTypeInput) vehicleTypeInput.value = "";
+if (vehicleColourInput) vehicleColourInput.value = "";
+
+// reload vehicles
+loadVehicles();
+updateSettingsView();
 
   } catch (err) {
     console.error(err);
@@ -513,6 +526,32 @@ function updateEmptyAlertsState(alertCount) {
 }
 
 // =========================================
+// DASHBOARD SUMMARY CARD
+// =========================================
+
+function updateDashboardSummary(summaryState, message) {
+  const card = document.getElementById("dashboardSummaryCard");
+  const icon = document.querySelector(".dashboard-summary-icon");
+  const text = document.getElementById("dashboardSummaryText");
+
+  if (!card || !icon || !text) return;
+
+  card.classList.remove("hidden", "warning", "urgent");
+
+  if (summaryState === "urgent") {
+    card.classList.add("urgent");
+    icon.textContent = "!";
+  } else if (summaryState === "warning") {
+    card.classList.add("warning");
+    icon.textContent = "!";
+  } else {
+    icon.textContent = "✓";
+  }
+
+  text.textContent = message;
+}
+
+// =========================================
 // PREMIUM ACTIVE DASHBOARD CONFIRMATION
 // =========================================
 
@@ -548,6 +587,8 @@ if (alertsList) {
 }
 
 let alertCount = 0;
+let urgentCount = 0;
+let warningCount = 0;
 
   const { data: { user } } = await client.auth.getUser();
 
@@ -568,6 +609,12 @@ let alertCount = 0;
   if (error || !data || data.length === 0) {
   updateEmptyFleetState(0);
   updateEmptyAlertsState(0);
+
+  updateDashboardSummary(
+    "clear",
+    "No vehicles added yet — add your first vehicle to start tracking reminders."
+  );
+
   isLoadingVehicles = false;
   return;
 }
@@ -588,9 +635,13 @@ updateEmptyFleetState(data.length);
       (taxDays !== null && taxDays <= 30) ||
       (insuranceDays !== null && insuranceDays <= 30);
 
-    if (urgentAlert || warningAlert) {
+    if (urgentAlert) {
+      urgentCount++;
       alertCount++;
-  }
+    } else if (warningAlert) {
+      warningCount++;
+      alertCount++;
+    }
 
     const mot = getMotStatusFromDays(v.mot_days);
     v.mot_status = mot.status;
@@ -725,10 +776,27 @@ await client
     list.appendChild(row);
   }
   
-  buildAlertsPanel(data);
-  updateEmptyAlertsState(alertCount);
-  
-  isLoadingVehicles = false;
+ buildAlertsPanel(data);
+updateEmptyAlertsState(alertCount);
+
+if (urgentCount > 0) {
+  updateDashboardSummary(
+    "urgent",
+    `${urgentCount} vehicle${urgentCount === 1 ? "" : "s"} need urgent attention.`
+  );
+} else if (warningCount > 0) {
+  updateDashboardSummary(
+    "warning",
+    `${warningCount} vehicle${warningCount === 1 ? "" : "s"} due soon.`
+  );
+} else {
+  updateDashboardSummary(
+    "clear",
+    "All clear — no urgent reminders today."
+  );
+}
+
+isLoadingVehicles = false;
 }
 
 // ===============================
