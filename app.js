@@ -412,7 +412,9 @@ async function forgotPasswordHandler(e) {
         reg,
         make,
         colour,
-
+      
+        vehicle_type: document.getElementById("vehicleTypeInput")?.value || null,
+        
         // MOT
         mot_status: motInfo.status,
         mot_days: motInfo.days,
@@ -1120,46 +1122,85 @@ document.addEventListener("DOMContentLoaded", initApp);
 // VEHICLE ICON
 // =======================
 function getVehicleIcon(v) {
- const make = (v.make || "").toLowerCase();
- const type = (v.vehicle_type || "").toLowerCase();
- const name = (v.name || "").toLowerCase();
+  const make = (v.make || "").toLowerCase();
+  const type = (v.vehicle_type || v.type || "").toLowerCase();
+  const name = (v.name || v.vehicle_name || "").toLowerCase();
 
- const text = `${make} ${type} ${name}`;
+  const text = `${type} ${name} ${make}`;
 
- const motorcycles = [
-   "motorcycle","motorbike","bike","scooter","moped",
-   "honda","yamaha","kawasaki","ducati","ktm","suzuki",
-   "triumph","harley","aprilia","vespa","piaggio","royal enfield",
-   "bsa","moto guzzi","indian"
- ];
+  // 1. MANUAL TYPE WINS FIRST
+  if (
+    type.includes("motorbike") ||
+    type.includes("motorcycle") ||
+    type.includes("bike") ||
+    type.includes("scooter") ||
+    type.includes("moped")
+  ) {
+    return "🏍️";
+  }
 
- const vans = [
-   "van","panel van","transit","sprinter","vivaro","trafic",
-   "crafter","ducato","boxer","relay","partner","berlingo",
-   "caddy","kangoo","nv200","nv300","nv400","vito","expert",
-   "dispatch","proace","doblo","combo","movano","master"
- ];
+  if (
+    type.includes("van") ||
+    type.includes("panel van") ||
+    type.includes("camper")
+  ) {
+    return "🚐";
+  }
 
- const hgvs = [
-   "hgv","lorry","truck","rigid","artic","tractor unit",
-   "daf","scania","man","iveco","volvo trucks","actros",
-   "atego","axor","renault trucks","isuzu truck","fuso"
- ];
+  if (
+    type.includes("truck") ||
+    type.includes("lorry") ||
+    type.includes("hgv")
+  ) {
+    return "🚛";
+  }
 
- const cars = [
-   "car","hatchback","saloon","estate","suv","mpv",
-   "ford","vauxhall","volkswagen","vw","audi","bmw",
-   "mercedes","toyota","nissan","hyundai","kia","peugeot",
-   "citroen","renault","skoda","seat","mazda","tesla",
-   "jaguar","land rover","range rover","mini","fiat","volvo"
- ];
+  if (
+    type.includes("car") ||
+    type.includes("hatchback") ||
+    type.includes("saloon") ||
+    type.includes("estate") ||
+    type.includes("suv") ||
+    type.includes("mpv")
+  ) {
+    return "🚗";
+  }
 
- if (motorcycles.some(x => text.includes(x))) return "🏍️";
- if (hgvs.some(x => text.includes(x))) return "🚛";
- if (vans.some(x => text.includes(x))) return "🚐";
- if (cars.some(x => text.includes(x))) return "🚗";
+  // 2. MODEL / NAME FALLBACK
+  // These are safer because they are vehicle models or body types, not just brand names.
 
- return "🚗";
+  const motorcycleWords = [
+    "motorcycle", "motorbike", "bike", "scooter", "moped",
+    "vespa", "piaggio", "harley", "ducati", "triumph",
+    "ktm", "ninja", "gsxr", "hayabusa", "bandit"
+  ];
+
+  const vanWords = [
+    "van", "panel van", "transit", "sprinter", "vivaro",
+    "trafic", "crafter", "ducato", "boxer", "relay",
+    "partner", "berlingo", "caddy", "kangoo", "nv200",
+    "nv300", "nv400", "vito", "expert", "dispatch",
+    "proace", "doblo", "combo", "movano", "master"
+  ];
+
+  const hgvWords = [
+    "hgv", "lorry", "truck", "rigid", "artic", "tractor unit",
+    "daf", "scania", "iveco", "actros", "atego", "axor", "fuso"
+  ];
+
+  const carWords = [
+    "car", "hatchback", "saloon", "estate", "suv", "mpv",
+    "golf", "fiesta", "focus", "astra", "corsa", "polo",
+    "clio", "yaris", "aygo", "civic", "corolla", "prius"
+  ];
+
+  if (motorcycleWords.some(x => text.includes(x))) return "🏍️";
+  if (hgvWords.some(x => text.includes(x))) return "🚛";
+  if (vanWords.some(x => text.includes(x))) return "🚐";
+  if (carWords.some(x => text.includes(x))) return "🚗";
+
+  // 3. DEFAULT
+  return "🚗";
 }
 
 document.getElementById("upgradeBtn")?.addEventListener("click", async () => {
