@@ -193,7 +193,19 @@
       <h3>Your Vehicles</h3>
       <p class="section-subtext">Saved vehicles appear here.</p>
     </div>
+    
+    <!-- =========================================
+     EMPTY FLEET ONBOARDING STATE
+    ========================================= -->
+  <div id="emptyFleetState" class="empty-fleet-state hidden">
+  <div class="empty-fleet-icon">🚗</div>
 
+  <h3>Add your first vehicle</h3>
+
+  <p>
+    Enter a registration above to start tracking MOT, Tax and insurance reminders.
+  </p>
+</div>
     <div id="vehicleList"></div>
   </div>
 
@@ -207,6 +219,19 @@
     <p class="section-subtitle">
       Important MOT, TAX and Insurance reminders.
     </p>
+   
+    <!-- =========================================
+     EMPTY ALERTS STATE
+    ========================================= -->
+  <div id="emptyAlertsState" class="empty-alerts-state hidden">
+  <div class="empty-alerts-icon">🔔</div>
+
+  <h3>No active alerts</h3>
+
+  <p>
+    You’re all clear. Vehicle reminders will appear here when MOT, TAX or insurance dates need attention.
+  </p>
+  </div>
 
     <div id="alertsList" class="alerts-list">
 
@@ -269,6 +294,25 @@
   </div>
 
   <script src="app.js"></script>
+
+  <!-- =========================================
+     PREMIUM SUCCESS POPUP
+========================================= -->
+<div id="premiumSuccessPopup" class="premium-success-popup hidden">
+  <div class="premium-success-card">
+    <div class="premium-success-icon">✓</div>
+
+    <h2>Premium is now Activated</h2>
+
+    <p>
+      Thank you! all vehicle compliance reminders are now enabled for your fleet.
+    </p>
+
+    <button id="premiumSuccessCloseBtn" class="premium-success-btn">
+      Continue
+    </button>
+  </div>
+</div>
 
 <footer class="footer-links">
 

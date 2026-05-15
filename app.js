@@ -478,6 +478,38 @@ if (regInputSetup) {
 
 }
 
+// =========================================
+// EMPTY FLEET ONBOARDING STATE
+// =========================================
+
+function updateEmptyFleetState(vehicleCount) {
+  const emptyFleetState = document.getElementById("emptyFleetState");
+
+  if (!emptyFleetState) return;
+
+  if (vehicleCount === 0) {
+    emptyFleetState.classList.remove("hidden");
+  } else {
+    emptyFleetState.classList.add("hidden");
+  }
+}
+
+// =========================================
+// EMPTY ALERTS STATE
+// =========================================
+
+function updateEmptyAlertsState(alertCount) {
+  const emptyAlertsState = document.getElementById("emptyAlertsState");
+
+  if (!emptyAlertsState) return;
+
+  if (alertCount === 0) {
+    emptyAlertsState.classList.remove("hidden");
+  } else {
+    emptyAlertsState.classList.add("hidden");
+  }
+}
+
 // =======================
 // LOAD VEHICLES (PREMIUM FINAL)
 // =======================
@@ -497,6 +529,8 @@ if (alertsList) {
   alertsList.innerHTML = "";
 }
 
+let alertCount = 0;
+
   const { data: { user } } = await client.auth.getUser();
 
   if (!user) {
@@ -514,10 +548,13 @@ if (alertsList) {
     console.log(data);
     
   if (error || !data || data.length === 0) {
-    list.innerHTML = "<p>No vehicles</p>";
-    isLoadingVehicles = false;
-    return;
-  }
+  updateEmptyFleetState(0);
+  updateEmptyAlertsState(0);
+  isLoadingVehicles = false;
+  return;
+}
+
+updateEmptyFleetState(data.length);
 
   for (const v of data) {
     
@@ -532,6 +569,11 @@ if (alertsList) {
       (v.mot_days !== null && v.mot_days <= 30) ||
       (taxDays !== null && taxDays <= 30) ||
       (insuranceDays !== null && insuranceDays <= 30);
+
+    if (urgentAlert || warningAlert) {
+      alertCount++;
+  }
+
     const mot = getMotStatusFromDays(v.mot_days);
     v.mot_status = mot.status;
    // DO NOT overwrite v.mot_days
@@ -666,7 +708,8 @@ await client
   }
   
   buildAlertsPanel(data);
-
+  updateEmptyAlertsState(alertCount);
+  
   isLoadingVehicles = false;
 }
 
@@ -1074,6 +1117,27 @@ document.getElementById("upgradeBtn")?.addEventListener("click", async () => {
   }
 });
 
+// =========================================
+// PREMIUM SUCCESS POPUP
+// =========================================
+
+function showPremiumSuccessPopup() {
+  const popup = document.getElementById("premiumSuccessPopup");
+  const closeBtn = document.getElementById("premiumSuccessCloseBtn");
+
+  if (!popup) return;
+
+  popup.classList.remove("hidden");
+
+  if (closeBtn && !closeBtn.dataset.bound) {
+    closeBtn.dataset.bound = "true";
+
+    closeBtn.addEventListener("click", () => {
+      popup.classList.add("hidden");
+    });
+  }
+}
+
 // =======================
 // STRIPE SUCCESS HANDLER
 // =======================
@@ -1097,8 +1161,8 @@ async function checkStripeReturn() {
       // Clean URL
       window.history.replaceState({}, document.title, "/app.html");
 
-      // Reload to update UI
-      location.reload();
+     // Show premium success popup
+      showPremiumSuccessPopup();
     } else {
       console.warn("Verification failed response:", data);
     }
