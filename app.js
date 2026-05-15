@@ -738,8 +738,11 @@ await client
           </div>
         </div>
 
-        <button class="delete-btn">✕</button>
-      </div>
+         <div class="vehicle-card-actions">
+          <button class="edit-btn" type="button">Edit</button>
+          <button class="delete-btn" type="button">×</button>
+         </div>
+         </div>
      
       <div class="vehicle-status">
        ${urgentAlert ? `
@@ -767,7 +770,63 @@ await client
    INS: ${insuranceDays !== null ? `${insuranceDays} days` : "Not set"}
    </div>
   </div>
+
+  <div class="vehicle-edit-panel hidden">
+  <h4>Edit vehicle details</h4>
+
+  <label>
+    Vehicle type
+    <input class="edit-vehicle-type" type="text" value="${v.vehicle_type || ""}" placeholder="Car / Van / Bike" />
+  </label>
+
+  <label>
+    TAX renewal date
+    <input class="edit-tax-date" type="date" value="${v.tax_due_date || ""}" />
+  </label>
+
+  <label>
+    Insurance expiry
+    <input class="edit-insurance-date" type="date" value="${v.insurance_expiry || ""}" />
+  </label>
+
+  <button class="save-edit-btn" type="button">Save changes</button>
+</div>
     `;
+
+    row.querySelector(".edit-btn").onclick = () => {
+  const panel = row.querySelector(".vehicle-edit-panel");
+  if (!panel) return;
+
+  panel.classList.toggle("hidden");
+};
+
+  row.querySelector(".save-edit-btn").onclick = async () => {
+  const typeInput = row.querySelector(".edit-vehicle-type");
+  const taxInput = row.querySelector(".edit-tax-date");
+  const insuranceInput = row.querySelector(".edit-insurance-date");
+
+  const vehicleType = typeInput?.value.trim() || null;
+  const taxDate = taxInput?.value || null;
+  const insuranceDate = insuranceInput?.value || null;
+
+  const { error } = await client
+    .from("vehicles")
+    .update({
+      vehicle_type: vehicleType,
+      tax_due_date: taxDate,
+      insurance_expiry: insuranceDate,
+    })
+    .eq("id", v.id);
+
+  if (error) {
+    console.error("Vehicle edit save error:", error);
+    alert("Could not save vehicle changes. Please try again.");
+    return;
+  }
+
+  await loadVehicles();
+  updateSettingsView();
+};
 
     row.querySelector(".delete-btn").onclick = async () => {
       await client.from("vehicles").delete().eq("id", v.id);

@@ -3771,3 +3771,122 @@ input:focus {
     0 10px 24px rgba(239, 68, 68, 0.28),
     0 0 0 7px rgba(239, 68, 68, 0.09);
 }
+
+/* =========================================
+   VEHICLE EDIT BUTTON
+========================================= */
+
+.vehicle-card-actions {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vehicle-card-actions .edit-btn {
+  height: 34px;
+  padding: 0 13px;
+
+  border: 0;
+  border-radius: 999px;
+
+  font-size: 0.78rem;
+  font-weight: 900;
+
+  color: #075985;
+  background: rgba(224, 242, 254, 0.92);
+
+  box-shadow:
+    0 8px 18px rgba(14, 165, 233, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+
+  cursor: pointer;
+}
+
+.vehicle-card-actions .edit-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(186, 230, 253, 0.95);
+}
+
+/* =========================================
+   VEHICLE EDIT PANEL
+========================================= */
+
+.vehicle-edit-panel {
+  margin-top: 18px;
+  padding: 18px;
+
+  background: rgba(248, 250, 252, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 20px;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.vehicle-edit-panel.hidden {
+  display: none !important;
+}
+
+.vehicle-edit-panel h4 {
+  margin: 0 0 14px;
+
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.vehicle-edit-panel label {
+  display: block;
+  margin-bottom: 12px;
+
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #475569;
+}
+
+.vehicle-edit-panel input {
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px 13px;
+
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 14px;
+
+  font-size: 0.92rem;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.vehicle-edit-panel input:focus {
+  outline: none;
+  border-color: rgba(14, 165, 233, 0.55);
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+}
+
+.save-edit-btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 13px 16px;
+
+  border: 0;
+  border-radius: 999px;
+
+  font-size: 0.9rem;
+  font-weight: 900;
+
+  color: #ffffff;
+  background: linear-gradient(135deg, #0284c7, #0ea5e9);
+
+  box-shadow: 0 12px 26px rgba(14, 165, 233, 0.25);
+
+  cursor: pointer;
+}
+
+.save-edit-btn:hover {
+  transform: translateY(-1px);
+}
