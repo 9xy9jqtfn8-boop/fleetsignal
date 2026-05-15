@@ -3595,3 +3595,74 @@ input:focus {
 
   color: #64748b;
 }
+
+/* =========================================
+   PREMIUM ACTIVE DASHBOARD CONFIRMATION
+========================================= */
+
+.premium-active-banner {
+  margin: 0 0 18px;
+  padding: 16px 18px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  background:
+    radial-gradient(circle at top left, rgba(34, 197, 94, 0.20), transparent 42%),
+    linear-gradient(180deg, rgba(240, 253, 244, 0.96), rgba(255, 255, 255, 0.94));
+
+  border: 1px solid rgba(34, 197, 94, 0.32);
+  border-radius: 22px;
+
+  box-shadow:
+    0 14px 34px rgba(15, 23, 42, 0.08),
+    0 0 24px rgba(34, 197, 94, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.premium-active-banner.hidden {
+  display: none !important;
+}
+
+.premium-active-icon {
+  width: 46px;
+  height: 46px;
+
+  flex: 0 0 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 16px;
+
+  font-size: 26px;
+  font-weight: 900;
+  color: #ffffff;
+
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+
+  box-shadow:
+    0 10px 24px rgba(34, 197, 94, 0.30),
+    0 0 0 7px rgba(34, 197, 94, 0.10);
+}
+
+.premium-active-text h3 {
+  margin: 0 0 3px;
+
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+
+  color: #14532d;
+}
+
+.premium-active-text p {
+  margin: 0;
+
+  font-size: 0.88rem;
+  line-height: 1.35;
+
+  color: #166534;
+}

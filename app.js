@@ -196,6 +196,7 @@ try {
 
   isPremium = profile?.is_premium ?? false;
   alertsEnabled = profile?.alerts_enabled ?? false;
+  updatePremiumActiveBanner(isPremium);
 
   const headerPlanBadge = document.getElementById("headerPlanBadge");
   const dashboardPlanBadge = document.getElementById("dashboardPlanBadge");
@@ -216,6 +217,7 @@ try {
 
 } catch (err) {
   console.error("Profile fetch error", err);
+  updatePremiumActiveBanner(false);
 }
 
   // Prevent duplicate listeners
@@ -507,6 +509,22 @@ function updateEmptyAlertsState(alertCount) {
     emptyAlertsState.classList.remove("hidden");
   } else {
     emptyAlertsState.classList.add("hidden");
+  }
+}
+
+// =========================================
+// PREMIUM ACTIVE DASHBOARD CONFIRMATION
+// =========================================
+
+function updatePremiumActiveBanner(isPremium) {
+  const banner = document.getElementById("premiumActiveBanner");
+
+  if (!banner) return;
+
+  if (isPremium) {
+    banner.classList.remove("hidden");
+  } else {
+    banner.classList.add("hidden");
   }
 }
 
