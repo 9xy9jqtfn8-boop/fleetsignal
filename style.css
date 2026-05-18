@@ -861,7 +861,6 @@ button {
   */
 }
 
-
 .mot-badge {
   padding: 6px 10px;
   border-radius: 8px;
@@ -2404,7 +2403,7 @@ input:focus {
   position: absolute;
 
   right: -150px;
-  top: 58px;
+  top: 34px;
 
   z-index: 2;
 
@@ -2425,17 +2424,17 @@ input:focus {
 
 /* LANES */
 .car-traffic {
-  top: 88px;
+  top: 50px;
   animation-delay: 6s;
 }
 
 .van-traffic {
-  top: 88px;
+  top: 50px;
   animation-delay: 0s;
 }
 
 .lorry-traffic {
-  top: 88px;
+  top: 50px;
   animation-delay: 12s;
 }
 
@@ -2515,12 +2514,12 @@ input:focus {
   justify-content: center !important;
 }
 
-/* VEHICLE TRAFFIC */
+/* MAIN HEADER VEHICLE TRAFFIC */
 
 .traffic {
   position: absolute !important;
 
-  top: 80px !important;
+  top: 75px !important;
 
   right: -150px !important;
 
@@ -3889,4 +3888,376 @@ input:focus {
 
 .save-edit-btn:hover {
   transform: translateY(-1px);
+}
+
+/* =========================================
+   FINAL MOBILE VEHICLE CARD TOP ROW OVERRIDE
+   Keeps Edit + Delete inline without overlapping plate
+========================================= */
+
+@media (max-width: 600px) {
+  .vehicle-card {
+    position: relative !important;
+  }
+
+  .vehicle-card-actions {
+    position: absolute !important;
+    top: -2px !important;
+    right: 8px !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+
+    z-index: 20 !important;
+  }
+
+  .vehicle-card-actions .edit-btn {
+    width: auto !important;
+    min-width: 54px !important;
+    height: 30px !important;
+
+    padding: 0 10px !important;
+
+    font-size: 0.7rem !important;
+    line-height: 1 !important;
+  }
+
+  .vehicle-card-actions .delete-btn {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+
+    font-size: 1rem !important;
+    line-height: 1 !important;
+  }
+
+  .vehicle-top {
+    position: relative !important;
+    padding-right: 112px !important;
+  }
+
+  .vehicle-left {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+
+    max-width: calc(100% - 112px) !important;
+  }
+
+  .vehicle-icon {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+
+    font-size: 1.55rem !important;
+    border-radius: 18px !important;
+  }
+
+  .saved-reg-plate {
+    transform: scale(0.82) !important;
+    transform-origin: left top !important;
+  }
+
+  .vehicle-meta {
+    margin-top: -4px !important;
+    font-size: 0.9rem !important;
+  }
+}
+
+/* =========================================
+   DESKTOP HEADER — FINAL WORKING VERSION
+   Mobile header remains untouched
+========================================= */
+
+@media (min-width: 701px) {
+  .app-header {
+    position: relative !important;
+
+    height: 96px !important;
+    min-height: 96px !important;
+
+    padding: 0 34px !important;
+
+    display: block !important;
+
+    overflow: hidden !important;
+  }
+
+  /* Logo + FleetSignal text */
+  .header-left {
+    position: absolute !important;
+    top: 14px !important;
+    left: 24px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+
+    z-index: 10 !important;
+  }
+
+  /* Premium + Logout */
+  .header-right {
+    position: absolute !important;
+    top: 24px !important;
+    right: 28px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    justify-content: flex-start !important;
+
+    gap: 6px !important;
+
+    width: 90px !important;
+
+    z-index: 20 !important;
+  }
+
+  /* HIDE desktop only — mobile stays unchanged */
+  /* Logged-in email pill under logo on desktop */
+#headerUserEmail,
+.header-user-email {
+ display: none !important;
+}
+
+  #headerPlanBadge,
+  .header-plan-badge,
+  .badge.premium,
+  .badge.free {
+    position: static !important;
+
+    width: 90px !important;
+    max-width: 90px !important;
+    height: 24px !important;
+    min-height: 24px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-size: 0.68rem !important;
+    line-height: 1 !important;
+
+    text-align: center !important;
+    white-space: nowrap !important;
+
+    margin: 0 !important;
+  }
+
+  #logoutBtn {
+    position: static !important;
+
+    width: 90px !important;
+    max-width: 90px !important;
+    height: 24px !important;
+    min-height: 24px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-size: 0.68rem !important;
+    line-height: 1 !important;
+
+    text-align: center !important;
+    white-space: nowrap !important;
+
+    margin: 0 !important;
+  }
+}
+
+/* =========================================
+   FINAL DASHBOARD STATUS BANNERS
+   Signed in / Premium Active / Fleet Summary
+========================================= */
+
+.signed-in-banner,
+.premium-active-banner,
+.dashboard-summary-card {
+  width: 100% !important;
+
+  margin: 0 0 10px !important;
+  padding: 9px 16px !important;
+
+  min-height: 48px !important;
+  height: 48px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+
+  border-radius: 999px !important;
+
+  box-shadow:
+    0 8px 20px rgba(15, 23, 42, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72) !important;
+}
+
+/* Signed-in banner spacing from blue header */
+.signed-in-banner {
+  margin-top: 12px !important;
+
+  background: rgba(255, 255, 255, 0.78) !important;
+  border: 1px solid rgba(148, 163, 184, 0.22) !important;
+  color: #475569 !important;
+}
+
+.signed-in-banner.hidden {
+  display: none !important;
+}
+
+/* Shared left icon position */
+.signed-in-icon,
+.premium-active-icon,
+.dashboard-summary-icon {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin-left: 16px !important;
+  margin-right: 10px !important;
+
+  border-radius: 999px !important;
+  font-size: 18px !important;
+
+  flex: 0 0 30px !important;
+}
+
+/* Signed-in icon style */
+.signed-in-icon {
+  background: rgba(226, 232, 240, 0.75) !important;
+
+  box-shadow:
+    0 6px 14px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Signed-in text */
+.signed-in-label {
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  color: #64748b !important;
+}
+
+.signed-in-email {
+  max-width: 260px !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+
+  font-size: 0.78rem !important;
+  font-weight: 900 !important;
+  color: #0f172a !important;
+}
+
+/* Premium / summary text containers */
+.premium-active-text,
+.dashboard-summary-text {
+  min-width: 0 !important;
+  text-align: left !important;
+}
+
+/* Premium / summary titles */
+.premium-active-text h3,
+.dashboard-summary-text h3 {
+  margin: 0 !important;
+
+  font-size: 0.82rem !important;
+  font-weight: 900 !important;
+  line-height: 1.05 !important;
+}
+
+/* Premium / summary subtitle text */
+.premium-active-text p,
+.dashboard-summary-text p {
+  margin: 2px 0 0 !important;
+
+  font-size: 0.74rem !important;
+  line-height: 1.12 !important;
+}
+
+/* =========================================
+   CHECK VEHICLE FORM SPACING POLISH
+========================================= */
+
+.vehicle-meta-grid {
+  gap: 10px !important;
+}
+
+.input-group {
+  gap: 4px !important;
+  margin-bottom: 8px !important;
+}
+
+.input-label {
+  margin-bottom: 4px !important;
+  line-height: 1.15 !important;
+}
+
+#taxDueDate,
+#insuranceInput {
+  margin-top: 0 !important;
+}
+
+/* Check button now sits directly under Insurance Expiry */
+.check-vehicle-main-btn,
+#checkBtn {
+  margin-top: 10px !important;
+  margin-bottom: 14px !important;
+}
+
+/* Optional extras underneath the button */
+#vehicleNameInput,
+#vehicleTypeInput,
+#vehicleColourInput {
+  margin-top: 8px !important;
+}
+
+/* =========================================
+   DATE LABEL SPACING TIGHTEN
+========================================= */
+
+.vehicle-meta-grid .input-group {
+  gap: 0px !important;
+  margin-bottom: 6px !important;
+}
+
+.vehicle-meta-grid .input-label {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  line-height: 1.05 !important;
+}
+
+#taxDueDate,
+#insuranceInput {
+  margin-top: 0 !important;
+}
+
+/* =========================================
+  ADD DETAILS HEADING SIZE
+========================================= */
+
+.reg-card h3 {
+ font-size: 1rem !important;
+ line-height: 1.15 !important;
+ margin-bottom: 10px !important;
+}
+
+/* Fine-tune signed-in banner text only */
+.signed-in-label {
+ margin-left: -6px !important;
+}
+
+.signed-in-email {
+ margin-left: -2px !important;
 }

@@ -154,6 +154,12 @@ function showLogin() {
  if (bottomNav) bottomNav.classList.add("hidden");
  if (logoutBtn) logoutBtn.style.display = "none";
  if (headerEmail) headerEmail.innerText = "";
+
+ const signedInBanner = document.getElementById("signedInBanner");
+const signedInEmailText = document.getElementById("signedInEmailText");
+
+if (signedInBanner) signedInBanner.classList.add("hidden");
+if (signedInEmailText) signedInEmailText.textContent = "";
 }
 
 async function showDashboard(session) {
@@ -161,7 +167,7 @@ async function showDashboard(session) {
  const dashboardBox = getEl("vehiclesView");
  const logoutBtn = getEl("logoutBtn");
  const emailEl = getEl("dashboardUserEmail");
- const headerEmail = getEl("headerUserEmail");
+ const headerEmail = getEl("headerUserEmail"); 
  const alertsToggle = document.getElementById("alertsToggle");
  const alertsLabel = document.getElementById("alertsLabel");
  const upgradeBox = document.querySelector(".upgrade-box");
@@ -170,9 +176,18 @@ async function showDashboard(session) {
  if (dashboardBox) dashboardBox.classList.remove("hidden");
 
  const bottomNav = document.getElementById("bottomNav");
+ 
  if (bottomNav) bottomNav.classList.remove("hidden");
  if (emailEl) emailEl.innerText = session.user.email;
  if (headerEmail) headerEmail.innerText = session.user.email;
+ 
+ const signedInBanner = document.getElementById("signedInBanner");
+ const signedInEmailText = document.getElementById("signedInEmailText");
+
+if (signedInBanner && signedInEmailText && session?.user?.email) {
+  signedInEmailText.textContent = session.user.email;
+  signedInBanner.classList.remove("hidden");
+}
 
  const alertEmailInput = document.getElementById("alertEmailInput");
 
