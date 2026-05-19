@@ -1110,20 +1110,36 @@ async function initApp() {
  const urlParams = new URLSearchParams(window.location.search);
  const sessionId = urlParams.get("session_id");
 
-  if (sessionId) {
+ if (sessionId) {
   console.log("Stripe return detected");
 
   try {
-    await fetch(`/api/verify-Session?session_id=${sessionId}`);
+    const verifyRes = await fetch(`/api/verify-session?session_id=${sessionId}`);
+    const verifyData = await verifyRes.json();
 
-    // 🔥 instantly update UI WITHOUT reload
-    const { data: sessionData } = await client.auth.getSession();
-    if (sessionData?.session) {
-      showDashboard(sessionData.session);
+    console.log("Stripe verification response:", verifyData);
+
+    if (!verifyRes.ok || verifyData.success !== true) {
+      throw new Error(verifyData.error || "Stripe verification failed");
     }
 
-    // clean URL
+    // Clean URL so the session_id disappears
     window.history.replaceState({}, document.title, "/app.html");
+
+    // Get the current logged-in session again
+    const { data: sessionData } = await client.auth.getSession();
+
+    if (sessionData?.session) {
+      currentSession = sessionData.session;
+
+      // Reload dashboard so Premium appears immediately
+      await showDashboard(sessionData.session);
+
+      // Show Premium success popup
+      if (typeof showPremiumSuccessPopup === "function") {
+        showPremiumSuccessPopup();
+      }
+    }
 
   } catch (err) {
     console.error("Verification failed", err);
@@ -1373,7 +1389,7 @@ async function checkStripeReturn() {
   }
 }
 
-checkStripeReturn();
+// checkStripeReturn();
 
 // =======================
 // SHOW USER EMAIL
