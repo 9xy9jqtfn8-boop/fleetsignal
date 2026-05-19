@@ -244,17 +244,34 @@ try {
 
   if (alertsToggle) {
   alertsToggle.addEventListener("change", async () => {
-  updateAlertText();
+    const newValue = alertsToggle.checked;
 
-  try {
-    await client
-      .from("profiles")
-      .update({ alerts_enabled: alertsToggle.checked })
-      .eq("id", session.user.id);
-  } catch (err) {
-    console.error("Failed to save alerts setting", err);
-  }
-});
+    updateAlertText();
+
+    try {
+      const { data, error } = await client
+        .from("profiles")
+        .update({ alerts_enabled: newValue })
+        .eq("id", session.user.id)
+        .select("id, email, alerts_enabled")
+        .single();
+
+      if (error) {
+        console.error("Failed to save alerts setting:", error);
+        alertsToggle.checked = !newValue;
+        updateAlertText();
+        alert("Could not save alert setting. Please try again.");
+        return;
+      }
+
+      console.log("Alerts setting saved:", data);
+    } catch (err) {
+      console.error("Unexpected alerts setting error:", err);
+      alertsToggle.checked = !newValue;
+      updateAlertText();
+      alert("Could not save alert setting. Please try again.");
+    }
+  });
 
   if (!isPremium) {
     alertsToggle.checked = false;
