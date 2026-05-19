@@ -10,6 +10,26 @@ const supabase = createClient(
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const DAY_MS = 1000 * 60 * 60 * 24;
+
+function daysUntilDate(dateValue) {
+  if (!dateValue) return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const target = new Date(dateValue);
+  if (Number.isNaN(target.getTime())) return null;
+
+  target.setHours(0, 0, 0, 0);
+
+  return Math.ceil((target - today) / DAY_MS);
+}
+
+function isDueSoon(days) {
+  return typeof days === "number" && days >= 0 && days <= 30;
+}
+
 export default async function handler(req, res) {
   const secret = req.query.secret;
 
@@ -20,29 +40,76 @@ export default async function handler(req, res) {
   try {
     const now = new Date();
 
-    // Get vehicles that have an alert email
-    const { data: vehicles, error } = await supabase
+    // Get vehicles that belong to logged-in users
+    const { data: vehicles, error: vehiclesError } = await supabase
       .from("vehicles")
       .select("*")
-      .not("alert_email", "is", null);
+      .not("user_id", "is", null);
 
-    if (error) {
-      console.error("Fetch error:", error);
-      return res.status(500).json({ error: error.message });
+    if (vehiclesError) {
+      console.error("Vehicle fetch error:", vehiclesError);
+      return res.status(500).json({ error: vehiclesError.message });
+    }
+
+    if (!vehicles || vehicles.length === 0) {
+      return res.status(200).json({
+        success: true,
+        sent: 0,
+        checked: 0,
+        message: "No vehicles found",
+      });
+    }
+
+    // Get all linked user profile IDs
+    const userIds = [...new Set(vehicles.map((v) => v.user_id).filter(Boolean))];
+
+    const { data: profiles, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, email, is_premium, alerts_enabled")
+      .in("id", userIds);
+
+    if (profilesError) {
+      console.error("Profile fetch error:", profilesError);
+      return res.status(500).json({ error: profilesError.message });
+    }
+
+    const profileById = new Map();
+    for (const profile of profiles || []) {
+      profileById.set(profile.id, profile);
     }
 
     let sent = 0;
+    let checked = 0;
+    let skippedFree = 0;
+    let skippedAlertsOff = 0;
+    let skippedCooldown = 0;
+    let skippedNoTrigger = 0;
 
     for (const v of vehicles) {
-      const motDays = Number(v.mot_days) || 0;
+      checked++;
 
-      // Skip if alerts are switched off
-      if (v.alerts_enabled === false) {
+      const profile = profileById.get(v.user_id);
+
+      // Skip if no matching profile
+      if (!profile) {
         continue;
       }
 
-      // Only send MOT reminders if between 1 and 30 days
-      if (motDays <= 0 || motDays > 30) {
+      // Premium protection: only premium users receive compliance emails
+      if (profile.is_premium !== true) {
+        skippedFree++;
+        continue;
+      }
+
+      // Profile-level alerts switch
+      if (profile.alerts_enabled === false) {
+        skippedAlertsOff++;
+        continue;
+      }
+
+      // Vehicle-level alerts switch
+      if (v.alerts_enabled === false) {
+        skippedAlertsOff++;
         continue;
       }
 
@@ -51,24 +118,91 @@ export default async function handler(req, res) {
         : null;
 
       const daysSinceLast = lastSent
-        ? (now - lastSent) / (1000 * 60 * 60 * 24)
+        ? (now - lastSent) / DAY_MS
         : null;
 
-      // 7 day cooldown
+      // 7 day cooldown per vehicle
       if (lastSent && daysSinceLast < 7) {
+        skippedCooldown++;
         continue;
       }
 
       const reg = v.reg || "Unknown registration";
       const make = v.make || "Unknown vehicle";
       const taxStatus = v.tax_status || "Unknown";
-      const insuranceExpiry = v.insurance_expiry || "Not added";
-      const alertType = "MOT";
+      const motDays = Number(v.mot_days);
+
+      const taxDays = daysUntilDate(v.tax_due_date);
+      const insuranceDays = daysUntilDate(v.insurance_expiry);
+
+      const dueItems = [];
+
+      if (isDueSoon(motDays)) {
+        dueItems.push({
+          type: "MOT",
+          label: "MOT Warning",
+          value: `${motDays} days remaining`,
+          detail: "Your MOT test is approaching expiry. Book early to avoid disruption or penalties.",
+        });
+      }
+
+      if (isDueSoon(taxDays)) {
+        dueItems.push({
+          type: "Tax",
+          label: "Tax Renewal",
+          value: `${taxDays} days remaining`,
+          detail: "Your vehicle tax renewal date is approaching. Check and renew in good time.",
+        });
+      }
+
+      if (isDueSoon(insuranceDays)) {
+        dueItems.push({
+          type: "Insurance",
+          label: "Insurance Alert",
+          value: `${insuranceDays} days remaining`,
+          detail: "Your insurance cover is approaching expiry. Renew in good time to avoid driving uninsured.",
+        });
+      }
+
+      // Skip if nothing is due within 30 days
+      if (dueItems.length === 0) {
+        skippedNoTrigger++;
+        continue;
+      }
+
+      const emailTo = profile.email || v.alert_email;
+
+      if (!emailTo) {
+        console.error("No email found for vehicle:", reg);
+        continue;
+      }
+
+      const alertTypes = dueItems.map((item) => item.type).join(", ");
+
+      const alertCardsHtml = dueItems
+        .map(
+          (item) => `
+    <div style="background:#fff7ed;border:2px solid #fb923c;border-radius:14px;padding:16px 18px;margin-top:18px;margin-bottom:18px;">
+      <div style="color:#c2410c;font-size:13px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">
+        ${item.label}
+      </div>
+
+      <div style="color:#9a3412;font-size:22px;font-weight:800;line-height:1.25;margin-bottom:10px;">
+        ${item.value}
+      </div>
+
+      <div style="color:#7c2d12;font-size:15px;line-height:1.5;">
+        ${item.detail}
+      </div>
+    </div>
+`
+        )
+        .join("");
 
       try {
         await resend.emails.send({
           from: "FleetSignal <alerts@getfleetsignal.com>",
-          to: v.alert_email,
+          to: emailTo,
           subject: `Vehicle compliance alert for ${reg}`,
           html: `
 <div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;background:#f5f7fb;padding:30px;">
@@ -80,7 +214,7 @@ export default async function handler(req, res) {
     </div>
 
     <div style="font-size:14px;color:#64748b;margin-bottom:20px;">
-      ${alertType} reminder for your vehicle
+      ${alertTypes} reminder for your vehicle
     </div>
 
     <div style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;border-radius:12px;padding:20px;margin-bottom:20px;">
@@ -93,7 +227,9 @@ export default async function handler(req, res) {
         </div>
 
         <div>
-          <strong>MOT Days Left:</strong> ${motDays}
+          <strong>MOT Days Left:</strong> ${
+            Number.isFinite(motDays) ? motDays : "Unknown"
+          }
         </div>
 
         <div>
@@ -101,63 +237,19 @@ export default async function handler(req, res) {
         </div>
 
         <div>
-          <strong>Insurance:</strong> ${insuranceExpiry}
+          <strong>Tax Renewal:</strong> ${v.tax_due_date || "Not added"}
+        </div>
+
+        <div>
+          <strong>Insurance:</strong> ${v.insurance_expiry || "Not added"}
         </div>
       </div>
     </div>
 
-    <div style="background:#fff7ed;border:2px solid #fb923c;border-radius:14px;padding:16px 18px;margin-top:18px;margin-bottom:18px;">
-      <div style="color:#c2410c;font-size:13px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">
-        MOT Warning
-      </div>
-
-      <div style="color:#9a3412;font-size:22px;font-weight:800;line-height:1.25;margin-bottom:10px;">
-        ${motDays} days remaining
-      </div>
-
-      <div style="color:#7c2d12;font-size:15px;line-height:1.5;">
-        Your MOT test is approaching expiry. Book early to avoid disruption or penalties.
-      </div>
-    </div>
-
-    <div style="background:#f0fdf4;border:2px solid #22c55e;border-radius:14px;padding:18px;margin-top:18px;margin-bottom:18px;">
-      <div style="color:#15803d;font-size:13px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">
-        Tax Status
-      </div>
-
-      <div style="color:#166534;font-size:24px;font-weight:800;line-height:1.1;margin-bottom:10px;">
-        ${taxStatus}
-      </div>
-
-      <div style="color:#166534;font-size:15px;line-height:1.5;">
-        Vehicle tax monitoring is active through FleetSignal.
-      </div>
-    </div>
-
-    <div style="background:#fff4f4;border:2px solid #ef4444;border-radius:14px;padding:16px 18px;margin-top:18px;margin-bottom:18px;">
-      <div style="color:#b91c1c;font-size:13px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">
-        Insurance
-      </div>
-
-      <div style="color:#7f1d1d;font-size:22px;font-weight:800;line-height:1.25;margin-bottom:10px;">
-        ${insuranceExpiry}
-      </div>
-
-      <div style="color:#991b1b;font-size:15px;line-height:1.5;">
-        If your insurance is approaching expiry, renew in good time to avoid driving uninsured.
-      </div>
-    </div>
-
-    <div style="font-size:16px;color:#0f172a;margin-bottom:12px;">
-      Your MOT expires in:
-    </div>
-
-    <div style="font-size:28px;font-weight:800;color:#ef4444;margin-bottom:20px;">
-      ${motDays} days
-    </div>
+    ${alertCardsHtml}
 
     <div style="font-size:14px;color:#64748b;line-height:1.6;">
-      Don’t risk fines or invalid insurance. Book your MOT now to stay compliant.
+      FleetSignal is monitoring this vehicle for MOT, tax, and insurance compliance reminders.
     </div>
 
     <div style="margin-top:24px;">
@@ -186,14 +278,18 @@ export default async function handler(req, res) {
 
         sent++;
       } catch (err) {
-        console.error("Email failed:", v.reg, err);
+        console.error("Email failed:", reg, err);
       }
     }
 
     return res.status(200).json({
       success: true,
       sent,
-      checked: vehicles.length,
+      checked,
+      skippedFree,
+      skippedAlertsOff,
+      skippedCooldown,
+      skippedNoTrigger,
     });
   } catch (err) {
     console.error("Daily check failed:", err);
