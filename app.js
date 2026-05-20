@@ -462,6 +462,7 @@ console.log("DVLA DATA:", data);
         make,
         colour,
       
+        vehicle_name: document.getElementById("vehicleNameInput")?.value || null,
         vehicle_type: document.getElementById("vehicleTypeInput")?.value || null,
         
         // MOT
@@ -774,6 +775,11 @@ await client
 
     row.className = `vehicle-card ${motClass}`;
 
+    const vehicleDisplayName =
+    v.vehicle_name && v.vehicle_name.trim() !== ""
+    ? v.vehicle_name.trim()
+    : `${v.make || ""} ${v.colour || ""}`.trim();
+
     row.innerHTML = `
       <div class="vehicle-top">
         <div class="vehicle-left">
@@ -783,7 +789,7 @@ await client
             <span class="gb-badge"></span>
             <span class="reg-text">${v.reg}</span>
           </div> 
-            <div class="vehicle-meta">${v.make || ""} ${v.colour || ""}</div>
+            <div class="vehicle-meta">${vehicleDisplayName}</div>
           </div>
         </div>
 
