@@ -397,12 +397,29 @@ async function forgotPasswordHandler(e) {
     // ==========================
     // FETCH FROM API
     // ==========================
-    const res = await fetch(`/api/mot?reg=${reg}`);
-    const data = await res.json();
+   const res = await fetch(`/api/mot?reg=${reg}`);
+   const data = await res.json();
 
-    if (!res.ok) throw new Error(data.error);
+   if (!res.ok) throw new Error(data.error || "Vehicle not found");
 
-    console.log("DVLA DATA:", data);
+// Stop invalid / unknown registrations being saved
+if (
+  !data ||
+  data.error ||
+  !data.make ||
+  data.make.trim() === "" ||
+  data.make.toLowerCase() === "unknown"
+) {
+  setResultMessage(`
+    <div class="result-card error">
+      <strong>Vehicle not found</strong><br>
+      Please check the registration and try again.
+    </div>
+  `);
+  return;
+}
+
+console.log("DVLA DATA:", data);
 
     // ==========================
     // EXTRACT DATA

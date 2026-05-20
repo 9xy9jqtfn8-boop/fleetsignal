@@ -4078,13 +4078,15 @@ input:focus {
 .signed-in-banner,
 .premium-active-banner,
 .dashboard-summary-card {
-  width: 100% !important;
+ width: calc(100%) !important;
+ margin-left: -14px !important;
+ margin-right: -14px !important;
 
   margin: 0 0 10px !important;
   padding: 9px 16px !important;
 
   min-height: 48px !important;
-  height: 48px !important;
+  height: 56px !important;
 
   display: flex !important;
   align-items: center !important;
