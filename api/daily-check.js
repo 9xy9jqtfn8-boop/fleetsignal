@@ -133,7 +133,9 @@ export default async function handler(req, res) {
       const motDays = Number(v.mot_days);
 
       const taxDays = daysUntilDate(v.tax_due_date);
-      const insuranceDays = daysUntilDate(v.insurance_expiry);
+      const insuranceDays = v.insurance_expiry
+        ? daysUntilDate(v.insurance_expiry)
+        : null;
 
       const dueItems = [];
 
@@ -155,14 +157,14 @@ export default async function handler(req, res) {
         });
       }
 
-      if (isDueSoon(insuranceDays)) {
+       if (v.insurance_expiry && isDueSoon(insuranceDays)) {
         dueItems.push({
-          type: "Insurance",
-          label: "Insurance Alert",
-          value: `${insuranceDays} days remaining`,
-          detail: "Your insurance cover is approaching expiry. Renew in good time to avoid driving uninsured.",
-        });
-      }
+         type: "Insurance",
+         label: "Insurance Alert",
+         value: `${insuranceDays} days remaining`,
+         detail: "Your insurance cover is approaching expiry. Renew in good time to avoid driving uninsured.",
+       });
+     }
 
       // Skip if nothing is due within 30 days
       if (dueItems.length === 0) {
