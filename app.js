@@ -467,10 +467,55 @@ console.log("DVLA DATA:", data);
     // ==========================
     // SAVE TO SUPABASE
     // ==========================
-    const { data: { user } } = await client.auth.getUser();
-    if (!user) return;
+       const { data: { user } } = await client.auth.getUser();
+       if (!user) return;
 
-    await client.from("vehicles").upsert([
+/* =========================================
+   FREE PLAN LIMIT
+   Free users can save 1 vehicle only.
+   Premium users can save unlimited vehicles.
+========================================= */
+
+const { data: limitProfile, error: limitProfileError } = await client
+  .from("profiles")
+  .select("is_premium")
+  .eq("id", user.id)
+  .maybeSingle();
+
+if (limitProfileError) {
+  console.error("Could not check premium status:", limitProfileError);
+  alert("Could not check your plan. Please try again.");
+  return;
+}
+
+const userIsPremium = limitProfile?.is_premium === true;
+
+if (!userIsPremium) {
+  const { data: existingVehicles, error: vehicleLimitError } = await client
+    .from("vehicles")
+    .select("reg")
+    .eq("user_id", user.id);
+
+  if (vehicleLimitError) {
+    console.error("Could not check vehicle limit:", vehicleLimitError);
+    alert("Could not check your vehicle limit. Please try again.");
+    return;
+  }
+
+  const cleanNewReg = reg.toUpperCase().replace(/\s/g, "");
+
+  const alreadySaved = existingVehicles?.some((vehicle) => {
+    const cleanSavedReg = (vehicle.reg || "").toUpperCase().replace(/\s/g, "");
+    return cleanSavedReg === cleanNewReg;
+  });
+
+  if (!alreadySaved && existingVehicles && existingVehicles.length >= 1) {
+    alert("Free plan allows 1 saved vehicle. Upgrade to Premium to add unlimited vehicles and enable MOT, tax and insurance alerts.");
+    return;
+  }
+}
+
+await client.from("vehicles").upsert([
       {
         user_id: user.id,
         reg,

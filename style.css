@@ -4294,12 +4294,12 @@ input:focus {
   .plate-uk .gb-badge {
     position: absolute !important;
 
-    left: 18px !important;
+    left: 14px !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
 
-    width: 54px !important;
-    height: 36px !important;
+    width: 46px !important;
+    height: 32px !important;
 
     display: flex !important;
     align-items: center !important;
@@ -4320,13 +4320,13 @@ input:focus {
     max-width: 100% !important;
     height: 100% !important;
 
-    padding: 0 !important;
+    padding: 0 34px 0 115px !important;
     margin: 0 !important;
 
     text-align: center !important;
 
-    font-size: clamp(1.75rem, 7vw, 2.55rem) !important;
-    letter-spacing: 0.14em !important;
+    font-size: clamp(1.45rem, 5.7vw, 2.05rem) !important;
+    letter-spacing: 0.08em !important;
     line-height: 1 !important;
 
     box-sizing: border-box !important;
@@ -4481,5 +4481,47 @@ input:focus {
   #signedInEmailText {
     font-size: 15px !important;
     line-height: 1 !important;
+  }
+}
+
+/* =========================================
+   FIX: MAIN REG INPUT STARTS AFTER GB BADGE
+   Moves the actual input area right instead of using padding
+========================================= */
+
+@media (max-width: 700px) {
+  .reg-plate {
+    position: relative !important;
+  }
+
+  .reg-plate #regInput,
+  #regInput {
+    position: absolute !important;
+    left: 108px !important;
+    right: 44px !important;
+    top: 0 !important;
+    bottom: 0 !important;
+
+    width: auto !important;
+    height: 100% !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    text-align: center !important;
+
+    font-size: clamp(1.42rem, 5.5vw, 2rem) !important;
+    letter-spacing: 0.075em !important;
+    line-height: 1 !important;
+
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+  }
+
+  .reg-plate .gb-badge,
+  .plate-uk .gb-badge {
+    z-index: 3 !important;
   }
 }
