@@ -99,7 +99,7 @@
 
  <div class="premium-active-text">
    <h3>Premium Active</h3>
-   <p>Thank you! All reminders are enabled for this account.</p>
+   <p>Premium is active. You can now enable MOT, tax and insurance alert reminders for this account.</p>
  </div>
 </div>  
 
@@ -135,13 +135,19 @@
         </div>
 
       <input
-        id="regInput"
-        type="text"
-        placeholder="AB12 CDE"
-        maxlength="8"
-        autocomplete="off"
-      />
-
+      id="regInput"
+      type="search"
+      placeholder="AB12 CDE"
+      maxlength="8"
+      autocomplete="new-password"
+      autocorrect="off"
+      autocapitalize="characters"
+      spellcheck="false"
+      inputmode="text"
+      name="vehicle-reg-search"
+      aria-label="Vehicle registration"
+    />
+     
      </div> 
  
     </div>
@@ -340,7 +346,7 @@
     <h2>Premium is now Activated</h2>
 
     <p>
-      Thank you! all vehicle compliance reminders are now enabled for your fleet.
+      Thank you! Premium is active. You can now enable MOT, tax and insurance alert reminders for this account.
     </p>
 
     <button id="premiumSuccessCloseBtn" class="premium-success-btn">

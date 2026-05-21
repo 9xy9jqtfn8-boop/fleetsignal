@@ -263,23 +263,8 @@ try {
         alert("Could not save alert setting. Please try again.");
         return;
       }
-     
-/* Also enable alerts on all existing vehicles when account alerts are switched on */
-    if (newValue === true) {
-      const { error: vehiclesAlertError } = await client
-        .from("vehicles")
-        .update({ alerts_enabled: true })
-        .eq("user_id", session.user.id);
 
-    if (vehiclesAlertError) {
-      console.error("Failed to enable vehicle alerts:", vehiclesAlertError);
-      alert("Account alerts were saved, but vehicle alerts could not be enabled. Please check Supabase.");
-      return;
-  }
-}
-
-console.log("Alerts setting saved:", data);
-      
+      console.log("Alerts setting saved:", data);
     } catch (err) {
       console.error("Unexpected alerts setting error:", err);
       alertsToggle.checked = !newValue;
@@ -477,7 +462,6 @@ console.log("DVLA DATA:", data);
         make,
         colour,
       
-        vehicle_name: document.getElementById("vehicleNameInput")?.value || null,
         vehicle_type: document.getElementById("vehicleTypeInput")?.value || null,
         
         // MOT
@@ -786,32 +770,9 @@ await client
 
     const motClass = getMotClass(v.mot_status, v.mot_days);
     const icon = getVehicleIcon(v);
-    const tax =
-     taxDays !== null
-      ? {
-        status:
-          taxDays < 0
-            ? "Expired"
-            : taxDays <= 7
-            ? "Due now"
-            : taxDays <= 30
-            ? "Due soon"
-            : "Valid",
-        color:
-          taxDays <= 7
-            ? "red"
-            : taxDays <= 30
-            ? "yellow"
-            : "green"
-      }
-    : getTaxStatus(v.tax_status);
+    const tax = getTaxStatus(v.tax_status);
 
     row.className = `vehicle-card ${motClass}`;
-
-    const vehicleDisplayName =
-    v.vehicle_name && v.vehicle_name.trim() !== ""
-    ? v.vehicle_name.trim()
-    : `${v.make || ""} ${v.colour || ""}`.trim();
 
     row.innerHTML = `
       <div class="vehicle-top">
@@ -822,7 +783,7 @@ await client
             <span class="gb-badge"></span>
             <span class="reg-text">${v.reg}</span>
           </div> 
-            <div class="vehicle-meta">${vehicleDisplayName}</div>
+            <div class="vehicle-meta">${v.make || ""} ${v.colour || ""}</div>
           </div>
         </div>
 
@@ -1117,9 +1078,9 @@ function getMotClass(status, days) {
 function getTaxClass(status) {
   const s = (status || "").toLowerCase();
 
-  if (s.includes("untaxed")) return "red";
-  if (s.includes("sorn")) return "yellow";
   if (s.includes("taxed")) return "green";
+  if (s.includes("sorn")) return "yellow";
+  if (s.includes("untaxed")) return "red";
 
   return "yellow";
 }
