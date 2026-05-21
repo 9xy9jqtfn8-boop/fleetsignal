@@ -4387,3 +4387,99 @@ input:focus {
     margin-bottom: 18px !important;
   }
 }
+
+/* =========================================
+   MOBILE POLISH: PREMIUM + FLEET SUMMARY CARDS
+   Compact mobile cards without text overlap
+========================================= */
+
+@media (max-width: 700px) {
+  .premium-active-banner,
+  .dashboard-summary-card {
+    border-radius: 18px !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+    overflow: visible !important;
+  }
+
+  .premium-active-banner {
+    align-items: center !important;
+    height: auto !important;
+    min-height: auto !important;
+    padding: 10px 12px !important;
+  }
+
+  .dashboard-summary-card {
+    align-items: center !important;
+    padding: 10px 12px !important;
+  }
+
+  .premium-active-icon,
+  .dashboard-summary-icon {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    font-size: 20px !important;
+  }
+
+  .premium-active-text,
+  .dashboard-summary-text {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .premium-active-text h3,
+  .dashboard-summary-text h3 {
+    font-size: 16px !important;
+    line-height: 1.05 !important;
+    margin: 0 0 2px 0 !important;
+  }
+
+  .premium-active-text p,
+  .dashboard-summary-text p,
+  #dashboardSummaryText {
+    font-size: 12.5px !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+    white-space: normal !important;
+  }
+
+  .reg-hero {
+    margin-top: 8px !important;
+  }
+}
+
+/* =========================================
+   MOBILE POLISH: COMPACT SIGNED-IN EMAIL BANNER
+========================================= */
+
+@media (max-width: 700px) {
+  .signed-in-banner {
+    padding: 8px 16px !important;
+    min-height: 46px !important;
+    height: auto !important;
+    border-radius: 28px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .signed-in-icon {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    font-size: 18px !important;
+    margin-left: 4px !important;
+    margin-right: 6px !important;
+  }
+
+  .signed-in-label {
+    display: none !important;
+  }
+
+  .signed-in-email,
+  #signedInEmailText {
+    font-size: 15px !important;
+    line-height: 1 !important;
+  }
+}
