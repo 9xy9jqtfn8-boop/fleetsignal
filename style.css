@@ -4525,45 +4525,285 @@ input:focus {
 }
 
 /* =========================================
-   HEADER UPGRADE BUTTON
-   Shows for Free users only
+   FINAL HEADER BUTTON SCALE FIX
+   Keeps all 3 buttons stacked but much smaller
 ========================================= */
 
-.header-upgrade-btn {
-  border: none !important;
+.header-actions {
+  position: absolute !important;
+  top: -18px !important;
+  right: 18px !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+
+  gap: 4px !important;
+
+  width: auto !important;
+  height: auto !important;
+
+  z-index: 30 !important;
+
+  transform: none !important;
+}
+
+/* All header buttons same compact size */
+.header-actions .badge,
+#headerPlanBadge,
+.header-actions .header-upgrade-btn,
+#headerUpgradeBtn,
+.header-actions .logout-btn,
+#logoutBtn {
+  width: 78px !important;
+  min-width: 78px !important;
+  max-width: 78px !important;
+
+  height: 20px !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
+
+  padding: 0 6px !important;
+  margin: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
   border-radius: 999px !important;
+  box-sizing: border-box !important;
 
-  padding: 8px 18px !important;
-
-  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
-  color: white !important;
-
-  font-size: 0.78rem !important;
-  font-weight: 900 !important;
+  font-size: 0.52rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
   letter-spacing: 0.04em !important;
-  text-transform: uppercase !important;
 
-  cursor: pointer !important;
-
-  box-shadow:
-    0 8px 18px rgba(34, 197, 94, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  transform: none !important;
 }
 
-.header-upgrade-btn:hover {
-  transform: translateY(-1px) !important;
-  box-shadow:
-    0 10px 22px rgba(34, 197, 94, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
-}
-
+/* Keep Upgrade hidden when JS says hidden */
+#headerUpgradeBtn.hidden,
 .header-upgrade-btn.hidden {
   display: none !important;
 }
 
+/* Keep moving vehicles behind the buttons */
+.header-vehicles,
+.floating-vehicles,
+.vehicle-strip {
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+/* Mobile compact version */
 @media (max-width: 700px) {
-  .header-upgrade-btn {
-    padding: 7px 14px !important;
-    font-size: 0.68rem !important;
+  .header-actions {
+    top: -48px !important;
+    right: 10px !important;
+    gap: 3px !important;
+  }
+
+  .header-actions .badge,
+  #headerPlanBadge,
+  .header-actions .header-upgrade-btn,
+  #headerUpgradeBtn,
+  .header-actions .logout-btn,
+  #logoutBtn {
+    width: 70px !important;
+    min-width: 70px !important;
+    max-width: 70px !important;
+
+    height: 18px !important;
+    min-height: 18px !important;
+    max-height: 18px !important;
+
+    font-size: 0.46rem !important;
+  }
+}
+
+/* =========================================
+   FINAL HEADER UPGRADE GREEN STYLE
+   Restores premium green upgrade look
+========================================= */
+
+#headerUpgradeBtn,
+.header-upgrade-btn {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 55%, #15803d 100%) !important;
+  color: #ffffff !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  border-radius: 999px !important;
+
+  box-shadow:
+    0 6px 14px rgba(34, 197, 94, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.12) !important;
+
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25) !important;
+
+  font-weight: 900 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+/* =========================================
+   MOBILE HEADER LOGIN FIX
+   Hide account controls before login
+========================================= */
+
+body.auth-mode .header-actions,
+body.auth-mode .header-user-email {
+  display: none !important;
+}
+
+/* Keep the header clean on the login screen */
+body.auth-mode .app-header {
+  min-height: 96px !important;
+  height: 96px !important;
+  padding: 18px 20px !important;
+}
+
+/* Make the logo sit nicely when logged out */
+body.auth-mode .header-left {
+  width: 100% !important;
+  justify-content: flex-start !important;
+}
+
+/* Mobile logged-in header stays compact */
+@media (max-width: 700px) {
+  body.auth-mode .app-header {
+    min-height: 92px !important;
+    height: 92px !important;
+  }
+
+  body.auth-mode .logo-text,
+  body.auth-mode .brand-title,
+  body.auth-mode h1 {
+    font-size: 2rem !important;
+  }
+}
+
+/* =========================================
+   MOBILE HEADER CLEANUP
+   Hide small header email and raise vehicles
+========================================= */
+
+@media (max-width: 700px) {
+
+  /* Hide the small logged-in email pill inside the blue header only */
+  .app-header .header-user-email,
+  .app-header #headerUserEmail {
+    display: none !important;
+  }
+
+  /* Move the animated vehicles slightly higher */
+  .header-vehicles,
+  .floating-vehicles,
+  .vehicle-strip {
+    top: 44px !important;
+    bottom: auto !important;
+    transform: translateY(-6px) !important;
+  }
+}
+
+/* =========================================
+   FINAL MOBILE HEADER BUTTON FIX
+   Restore all buttons and lift stack slightly
+========================================= */
+
+@media (max-width: 700px) {
+
+  .app-header .header-actions {
+    position: absolute !important;
+
+    top: -72px !important;
+    right: 12px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    justify-content: flex-start !important;
+
+    gap: 3px !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    z-index: 60 !important;
+
+    transform: none !important;
+  }
+
+  .app-header .header-actions .badge,
+  .app-header #headerPlanBadge,
+  .app-header .header-actions .header-upgrade-btn,
+  .app-header #headerUpgradeBtn,
+  .app-header .header-actions .logout-btn,
+  .app-header #logoutBtn {
+    width: 70px !important;
+    min-width: 70px !important;
+    max-width: 70px !important;
+
+    height: 18px !important;
+    min-height: 18px !important;
+    max-height: 18px !important;
+
+    padding: 0 6px !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-size: 0.46rem !important;
+    line-height: 1 !important;
+
+    border-radius: 999px !important;
+    box-sizing: border-box !important;
+  }
+
+  .app-header #headerUpgradeBtn,
+  .app-header .header-upgrade-btn {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 55%, #15803d 100%) !important;
+    color: white !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .app-header #headerUpgradeBtn.hidden,
+  .app-header .header-upgrade-btn.hidden {
+    display: none !important;
+  }
+}
+
+/* =========================================
+   FINAL MOBILE TRAFFIC HEIGHT FIX
+   Raises animated header vehicles on mobile
+========================================= */
+
+@media (max-width: 700px) {
+  .app-header .traffic,
+  .app-header .car-traffic,
+  .app-header .van-traffic,
+  .app-header .lorry-traffic {
+    top: 68px !important;
+  }
+}
+
+/* =========================================
+   FINAL MOBILE HEADER BUTTON HEIGHT MATCH
+   Match Free and Logout height to Upgrade
+========================================= */
+
+@media (max-width: 700px) {
+  .app-header #headerPlanBadge,
+  .app-header .header-actions .badge,
+  .app-header #logoutBtn,
+  .app-header .header-actions .logout-btn {
+    height: 16px !important;
+    min-height: 16px !important;
+    max-height: 16px !important;
   }
 }
