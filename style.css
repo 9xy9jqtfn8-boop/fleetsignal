@@ -4523,3 +4523,47 @@ input:focus {
     box-sizing: border-box !important;
   }
 }
+
+/* =========================================
+   HEADER UPGRADE BUTTON
+   Shows for Free users only
+========================================= */
+
+.header-upgrade-btn {
+  border: none !important;
+  border-radius: 999px !important;
+
+  padding: 8px 18px !important;
+
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  color: white !important;
+
+  font-size: 0.78rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+
+  cursor: pointer !important;
+
+  box-shadow:
+    0 8px 18px rgba(34, 197, 94, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+}
+
+.header-upgrade-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow:
+    0 10px 22px rgba(34, 197, 94, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+}
+
+.header-upgrade-btn.hidden {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+  .header-upgrade-btn {
+    padding: 7px 14px !important;
+    font-size: 0.68rem !important;
+  }
+}

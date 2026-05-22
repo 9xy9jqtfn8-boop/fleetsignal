@@ -214,11 +214,16 @@ try {
   updatePremiumActiveBanner(isPremium);
 
   const headerPlanBadge = document.getElementById("headerPlanBadge");
+  const headerUpgradeBtn = document.getElementById("headerUpgradeBtn");
   const dashboardPlanBadge = document.getElementById("dashboardPlanBadge");
 
   if (headerPlanBadge) {
     headerPlanBadge.textContent = isPremium ? "PREMIUM" : "FREE";
     headerPlanBadge.className = isPremium ? "badge premium" : "badge free";
+  }
+
+  if (headerUpgradeBtn) {
+    headerUpgradeBtn.classList.toggle("hidden", isPremium);
   }
 
   if (dashboardPlanBadge) {
@@ -1451,6 +1456,14 @@ document.getElementById("upgradeBtn")?.addEventListener("click", async () => {
     alert("Payment failed. Try again.");
   }
 });
+
+// ===============================
+// HEADER UPGRADE BUTTON
+// Uses the same checkout flow as the main upgrade button
+// ===============================
+    document.getElementById("headerUpgradeBtn")?.addEventListener("click", () => {
+    document.getElementById("upgradeBtn")?.click();
+    });
 
 // =========================================
 // PREMIUM SUCCESS POPUP
