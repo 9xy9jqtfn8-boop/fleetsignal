@@ -1416,9 +1416,13 @@ function getVehicleIcon(v) {
   return "🚗";
 }
 
-document.getElementById("upgradeBtn")?.addEventListener("click", async () => {
+// ========================================
+// PREMIUM CHECKOUT - MONTHLY / ANNUAL
+// ========================================
+
+async function startPremiumCheckout(plan = "monthly") {
   try {
-    console.log("Starting checkout...");
+    console.log("Starting checkout:", plan);
 
     const { data: { user }, error } = await client.auth.getUser();
 
@@ -1434,6 +1438,8 @@ document.getElementById("upgradeBtn")?.addEventListener("click", async () => {
       },
       body: JSON.stringify({
         userId: user.id,
+        email: user.email,
+        plan: plan,
       }),
     });
 
@@ -1452,18 +1458,33 @@ document.getElementById("upgradeBtn")?.addEventListener("click", async () => {
 
     window.location.href = data.url;
   } catch (err) {
-    console.error("Stripe error:", err);
-    alert("Payment failed. Try again.");
+    console.error("Checkout error:", err);
+    alert("Payment failed. Please try again.");
   }
+}
+
+document.getElementById("upgradeMonthlyBtn")?.addEventListener("click", () => {
+  startPremiumCheckout("monthly");
 });
 
-// ===============================
+document.getElementById("upgradeAnnualBtn")?.addEventListener("click", () => {
+  startPremiumCheckout("annual");
+});
+
+// ========================================
 // HEADER UPGRADE BUTTON
-// Uses the same checkout flow as the main upgrade button
-// ===============================
-    document.getElementById("headerUpgradeBtn")?.addEventListener("click", () => {
-    document.getElementById("upgradeBtn")?.click();
+// Scrolls to the main upgrade box so user can choose Monthly or Annual
+// ========================================
+document.getElementById("headerUpgradeBtn")?.addEventListener("click", () => {
+  const upgradeBox = document.getElementById("upgradeBox");
+
+  if (upgradeBox) {
+    upgradeBox.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
     });
+  }
+});
 
 // =========================================
 // PREMIUM SUCCESS POPUP
