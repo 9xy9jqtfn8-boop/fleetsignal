@@ -3271,7 +3271,7 @@ input:focus {
 }
 
 .alert-title {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -3279,15 +3279,15 @@ input:focus {
 }
 
 .alert-big {
-  font-size: 38px;
+  font-size: 28px;
   font-weight: 900;
   line-height: 1;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .alert-text {
-  font-size: 17px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.45;
   opacity: 0.8;
 }
 
@@ -5005,7 +5005,7 @@ body.auth-mode .header-left {
   background: linear-gradient(135deg, #2563eb, #16a34a);
   color: #ffffff;
 
-  font-size: 14px;
+  font-size: 10px;
   font-weight: 800;
   cursor: pointer;
 
@@ -5075,5 +5075,24 @@ body.auth-mode .header-left {
 
   .landing-copyright {
     font-size: 13px !important;
+  }
+}
+
+/* =========================================
+   MOBILE ONLY - FINAL SIGNED-IN EMAIL SIZE
+========================================= */
+
+@media (max-width: 600px) {
+  #signedInBanner .signed-in-email,
+  #signedInBanner #signedInEmailText {
+    font-size: 12px !important;
+    line-height: 1 !important;
+    letter-spacing: 0 !important;
+    font-weight: 800 !important;
+
+    max-width: 190px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
   }
 }
