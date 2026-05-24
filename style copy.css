@@ -3143,44 +3143,28 @@ input:focus {
   text-align: center;
 
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
 
-  gap: 14px;
+  gap: 10px;
 
-  padding: 26px 20px 120px;
+  padding: 30px 20px 120px;
 
   color: #6b7280;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .footer-links a {
   color: #6b7280;
   text-decoration: none;
-  font-weight: 700;
+  font-weight: 600;
 
-  padding: 6px 8px;
-  border-radius: 999px;
+  margin: 0 10px;
 }
 
 .footer-links a:hover {
   color: #2563eb;
-  background: rgba(37, 99, 235, 0.08);
-}
-
-.footer-links .copyright {
-  width: 100%;
-  margin: 8px 0 0;
-  color: #94a3b8;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.footer-links .copyright {
-  margin-top: 8px;
-  opacity: 0.8;
 }
 
 .footer-contact-heading {
@@ -3189,6 +3173,11 @@ input:focus {
   font-size: 15px;
   font-weight: 800;
   color: #111827;
+}
+
+.footer-links .copyright {
+  margin-top: 8px;
+  opacity: 0.8;
 }
 
 /* COOKIE BANNER */
@@ -4195,56 +4184,6 @@ input:focus {
 }
 
 /* =========================================
-   SIGNED-IN BANNER WITH INSTALL BUTTON
-========================================= */
-
-.signed-in-banner {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-
-  width: 100% !important;
-  box-sizing: border-box !important;
-
-  gap: 12px !important;
-}
-
-.signed-in-left {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-
-  min-width: 0 !important;
-  flex: 1 1 auto !important;
-}
-
-.signed-in-left .signed-in-email,
-.signed-in-left #signedInEmailText {
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-}
-
-.banner-install-btn {
-  margin-left: auto !important;
-  flex-shrink: 0 !important;
-
-  border: none !important;
-  border-radius: 999px !important;
-  padding: 6px 12px !important;
-
-  font-size: 11px !important;
-  font-weight: 800 !important;
-
-  cursor: pointer !important;
-  color: #064e3b !important;
-  background: linear-gradient(135deg, #dcfce7, #86efac) !important;
-
-  box-shadow: 0 6px 14px rgba(22, 163, 74, 0.18) !important;
-  white-space: nowrap !important;
-}
-
-/* =========================================
    CHECK VEHICLE FORM SPACING POLISH
 ========================================= */
 
@@ -4965,115 +4904,4 @@ body.auth-mode .header-left {
 
 .premium-plan-btn:active {
   transform: translateY(0) scale(0.99) !important;
-}
-
-/* =========================================
-   INSTALL APP CARD
-========================================= */
-
-.install-app-card {
-  margin: 24px auto;
-  padding: 22px;
-  max-width: 520px;
-  text-align: center;
-
-  background: #ffffff;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  border-radius: 24px;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
-}
-
-.install-app-card h3 {
-  margin: 0 0 10px;
-  font-size: 20px;
-  font-weight: 900;
-  color: #0f172a;
-}
-
-.install-app-card p {
-  margin: 0 0 16px;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #64748b;
-}
-
-.install-app-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 12px 20px;
-
-  background: linear-gradient(135deg, #2563eb, #16a34a);
-  color: #ffffff;
-
-  font-size: 14px;
-  font-weight: 800;
-  cursor: pointer;
-
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.25);
-}
-
-.install-app-btn:hover {
-  transform: translateY(-1px);
-}
-
-/* =========================================
-   LANDING PAGE FOOTER FIX
-========================================= */
-
-.landing-footer {
-  width: 100% !important;
-  max-width: 980px !important;
-  margin: 56px auto 28px !important;
-  padding: 18px 20px 30px !important;
-  box-sizing: border-box !important;
-  text-align: center !important;
-}
-
-.landing-footer-links {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 34px !important;
-  flex-wrap: wrap !important;
-  margin-bottom: 18px !important;
-}
-
-.landing-footer-links a {
-  color: #1f2937 !important;
-  text-decoration: none !important;
-  font-size: 15px !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.02em !important;
-}
-
-.landing-footer-links a:hover {
-  color: #0284c7 !important;
-  text-decoration: underline !important;
-}
-
-.landing-copyright {
-  margin: 0 !important;
-  color: #6b7280 !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  text-align: center !important;
-}
-
-@media (max-width: 600px) {
-  .landing-footer {
-    margin-top: 38px !important;
-    padding-bottom: 24px !important;
-  }
-
-  .landing-footer-links {
-    gap: 18px !important;
-  }
-
-  .landing-footer-links a {
-    font-size: 14px !important;
-  }
-
-  .landing-copyright {
-    font-size: 13px !important;
-  }
 }

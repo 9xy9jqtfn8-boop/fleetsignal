@@ -90,9 +90,15 @@
      SIGNED IN AS BANNER
 ========================================= -->
 <div id="signedInBanner" class="signed-in-banner hidden">
-  <span class="signed-in-icon">👤</span>
-  <span class="signed-in-label"></span>
-  <span id="signedInEmailText" class="signed-in-email"></span>
+  <div class="signed-in-left">
+    <span class="signed-in-icon">👤</span>
+    <span class="signed-in-label"></span>
+    <span id="signedInEmailText" class="signed-in-email"></span>
+  </div>
+
+  <button type="button" id="headerInstallBtn" class="banner-install-btn" onclick="openInstallHelp()">
+  📱 Install App
+ </button>
 </div>
 
 <!-- =========================================
@@ -156,7 +162,7 @@
  
     </div>
 
-      <h3>Add the details below to get additional alerts (optional)</h3>
+      <h3>Add the details below for additional alerts (optional)</h3>
 
     <div class="vehicle-meta-grid">
        <div class="input-group">
@@ -223,7 +229,7 @@
   <div class="upgrade-eyebrow">Premium</div>
 
   <p>
-    <strong>Never miss an MOT, tax or insurance date again.</strong>
+    <strong>Never miss an MOT, Tax or Insurance date again.</strong>
   </p>
 
   <div class="upgrade-copy">
@@ -331,6 +337,18 @@
          Reminders are provided as a convenience only. You remain responsible for keeping vehicles compliant.
        </span>
      </div>
+      
+      <div class="install-app-card">
+  <h3>📱 Add FleetSignal to your phone</h3>
+
+  <p>
+    Save FleetSignal to your home screen for quick access to your MOT, tax and insurance reminders.
+  </p>
+
+  <button type="button" id="installHelpBtn" class="install-app-btn" onclick="openInstallHelp()">
+  Show me how
+</button>
+</div>
 
    </div>
  </div>
@@ -373,7 +391,7 @@
 
   <a href="privacy.html">Privacy</a>
 
-  <a href=""mailto:support@fleetsignal.com"></a>
+  <a href="mailto:support@fleetsignal.com">Contact us</a>
 
   <a href="terms.html">Terms</a>
 

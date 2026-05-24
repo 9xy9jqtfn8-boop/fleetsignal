@@ -1553,3 +1553,21 @@ async function checkStripeReturn() {
     document.getElementById("headerUserEmail").textContent = user.email;
   }
 })();
+
+/* =========================================
+   OPEN INSTALL HELP - HEADER BUTTON
+========================================= */
+
+window.openInstallHelp = function () {
+  alert(
+    "Add FleetSignal to your phone:\n\n" +
+    "iPhone:\n" +
+    "1. Open FleetSignal in Safari.\n" +
+    "2. Tap the Share button.\n" +
+    "3. Tap Add to Home Screen.\n\n" +
+    "Android:\n" +
+    "1. Open FleetSignal in Chrome.\n" +
+    "2. Tap the menu button.\n" +
+    "3. Tap Install app or Add to Home screen."
+  );
+};
