@@ -1571,3 +1571,28 @@ window.openInstallHelp = function () {
     "3. Tap Install app or Add to Home screen."
   );
 };
+
+/* =========================================
+   EMAIL REMINDER LOGIN NOTICE - SAFE VERSION
+========================================= */
+
+function showEmailLoginNoticeIfNeeded() {
+  const params = new URLSearchParams(window.location.search);
+  const openedFromEmail = params.get("from") === "email";
+
+  if (!openedFromEmail) return;
+
+  const notice = document.getElementById("emailLoginNotice");
+
+  if (notice) {
+    notice.classList.remove("hidden");
+    notice.style.setProperty("display", "block", "important");
+  }
+}
+
+// Run once after the page has fully loaded
+document.addEventListener("DOMContentLoaded", showEmailLoginNoticeIfNeeded);
+
+// Run again shortly after, in case FleetSignal auth/login display changes after load
+setTimeout(showEmailLoginNoticeIfNeeded, 500);
+setTimeout(showEmailLoginNoticeIfNeeded, 1200);

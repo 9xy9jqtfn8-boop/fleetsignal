@@ -196,8 +196,19 @@ export default async function handler(req, res) {
      Don’t risk fines or invalid insurance. Book your MOT now to stay compliant.
    </div>
 
-   <div style="margin-top:24px;">
-     <a href="https://www.gov.uk/getting-an-mot"
+   <div style="text-align:center; margin: 28px 0 14px;">
+  <a href="https://www.getfleetsignal.com/app.html?from=email"
+     style="display:inline-block;background:#2563eb;color:white;padding:14px 24px;border-radius:999px;text-decoration:none;font-weight:800;">
+    Open FleetSignal
+  </a>
+</div>
+
+<p style="font-size:13px;color:#64748b;line-height:1.5;text-align:center;margin:0 0 18px;">
+  If this opens in a different browser or private browsing app, you may be asked to log in again.
+</p>
+
+<div style="margin-top:24px;">
+  <a href="https://www.gov.uk/getting-an-mot"
         style="display:inline-block;background:#3b82f6;color:white;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:600;">
         Book MOT
      </a>
