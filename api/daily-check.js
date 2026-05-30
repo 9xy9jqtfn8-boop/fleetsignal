@@ -30,6 +30,72 @@ function isDueSoon(days) {
   return typeof days === "number" && days >= 0 && days <= 30;
 }
 
+function normaliseReg(reg) {
+  return String(reg || "")
+    .toUpperCase()
+    .replace(/\s+/g, "");
+}
+
+function getMotStatusFromExpiry(motExpiryDate) {
+  const days = daysUntilDate(motExpiryDate);
+
+  if (days === null) {
+    return {
+      motStatus: "Unknown",
+      motDays: null,
+      motExpiryDate: null,
+    };
+  }
+
+  if (days < 0) {
+    return {
+      motStatus: "Expired",
+      motDays: days,
+      motExpiryDate,
+    };
+  }
+
+  if (days <= 30) {
+    return {
+      motStatus: "Due Soon",
+      motDays: days,
+      motExpiryDate,
+    };
+  }
+
+  return {
+    motStatus: "Valid",
+    motDays: days,
+    motExpiryDate,
+  };
+}
+
+async function fetchDvlaVehicle(reg) {
+  const cleanReg = normaliseReg(reg);
+
+  const response = await fetch(
+    "https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles",
+    {
+      method: "POST",
+      headers: {
+        "x-api-key": process.env.DVLA_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        registrationNumber: cleanReg,
+      }),
+    }
+  );
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.message || "DVLA refresh failed");
+  }
+
+  return data;
+}
+
 export default async function handler(req, res) {
   const secret = req.query.secret;
 
@@ -84,11 +150,62 @@ export default async function handler(req, res) {
     let skippedAlertsOff = 0;
     let skippedCooldown = 0;
     let skippedNoTrigger = 0;
+    let dvlaRefreshed = 0;
+    let dvlaFailed = 0;
 
     for (const v of vehicles) {
-      checked++;
+  checked++;
 
-      const profile = profileById.get(v.user_id);
+  try {
+    const dvla = await fetchDvlaVehicle(v.reg);
+
+    const motInfo = getMotStatusFromExpiry(dvla.motExpiryDate);
+
+    const freshUpdate = {
+      make: dvla.make || v.make || null,
+      colour: dvla.colour || v.colour || null,
+      tax_status: dvla.taxStatus || v.tax_status || null,
+      mot_status: motInfo.motStatus,
+      mot_days: motInfo.motDays,
+      mot_expiry_date: motInfo.motExpiryDate,
+      last_dvla_checked: new Date().toISOString(),
+      dvla_refresh_error: null,
+    };
+
+    const { error: updateError } = await supabase
+      .from("vehicles")
+      .update(freshUpdate)
+      .eq("id", v.id);
+
+    if (updateError) {
+  console.error("DVLA save/update error:", updateError);
+  dvlaFailed++;
+} else {
+  dvlaRefreshed++;
+
+  v.make = freshUpdate.make;
+  v.colour = freshUpdate.colour;
+  v.tax_status = freshUpdate.tax_status;
+  v.mot_status = freshUpdate.mot_status;
+  v.mot_days = freshUpdate.mot_days;
+  v.mot_expiry_date = freshUpdate.mot_expiry_date;
+}
+
+  } catch (refreshError) {
+  dvlaFailed++;
+
+  console.error("DVLA refresh error for", v.reg, refreshError);
+
+  await supabase
+      .from("vehicles")
+      .update({
+        last_dvla_checked: new Date().toISOString(),
+        dvla_refresh_error: refreshError.message || "DVLA refresh failed",
+      })
+      .eq("id", v.id);
+  }
+
+  const profile = profileById.get(v.user_id);
 
       // Skip if no matching profile
       if (!profile) {
@@ -296,14 +413,17 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({
-      success: true,
-      sent,
-      checked,
-      skippedFree,
-      skippedAlertsOff,
-      skippedCooldown,
-      skippedNoTrigger,
-    });
+  success: true,
+  sent,
+  checked,
+  dvlaRefreshed,
+  dvlaFailed,
+  skippedFree,
+  skippedAlertsOff,
+  skippedCooldown,
+  skippedNoTrigger,
+});
+
   } catch (err) {
     console.error("Daily check failed:", err);
     return res.status(500).json({ error: err.message });
