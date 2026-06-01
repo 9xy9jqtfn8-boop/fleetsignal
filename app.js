@@ -836,24 +836,33 @@ await client
 
     const motClass = getMotClass(v.mot_status, v.mot_days);
     const icon = getVehicleIcon(v);
-    const tax =
-     taxDays !== null
-      ? {
-        status:
-          taxDays < 0
-            ? "Expired"
-            : taxDays <= 7
-            ? "Due now"
-            : taxDays <= 30
-            ? "Due soon"
-            : "Valid",
-        color:
-          taxDays <= 7
-            ? "red"
-            : taxDays <= 30
-            ? "yellow"
-            : "green"
-      }
+    const taxStatusLower = (v.tax_status || "").toLowerCase();
+
+const tax =
+  taxDays !== null
+    ? (
+        taxStatusLower === "taxed" && taxDays < 0
+          ? {
+              status: "Taxed",
+              color: "green"
+            }
+          : {
+              status:
+                taxDays < 0
+                  ? "Expired"
+                  : taxDays <= 7
+                  ? "Due now"
+                  : taxDays <= 30
+                  ? "Due soon"
+                  : "Valid",
+              color:
+                taxDays <= 7
+                  ? "red"
+                  : taxDays <= 30
+                  ? "yellow"
+                  : "green"
+            }
+      )
     : getTaxStatus(v.tax_status);
 
     row.className = `vehicle-card ${motClass}`;
@@ -900,7 +909,7 @@ await client
 
   <div class="status-pill ${tax.color}">
     <span class="dot"></span>
-     TAX: ${tax.status}${taxDays !== null ? ` (${taxDays} days)` : ""}
+     TAX: ${tax.status}${tax.status === "Taxed" ? "" : taxDays !== null ? ` (${taxDays} days)` : ""}
   </div>
 
   <div class="status-pill ${insuranceDays !== null && insuranceDays < 7 ? 'red' : insuranceDays !== null && insuranceDays < 30 ? 'orange' : 'green'}">
