@@ -5660,3 +5660,76 @@ body {
   background: rgba(22, 163, 74, 0.18);
   border-color: rgba(74, 222, 128, 0.4);
 }
+
+/* =========================================
+   SEO PAGE BACK BUTTON FIX
+   Forces all SEO back links to match the MOT page style
+========================================= */
+
+.back-to-site {
+  position: fixed !important;
+  top: 12px !important;
+  left: 12px !important;
+  z-index: 9999 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 5px 10px !important;
+  border-radius: 999px !important;
+
+  background: rgba(10, 18, 28, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.back-to-site:visited,
+.back-to-site:hover,
+.back-to-site:active {
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+.back-to-site:hover {
+  transform: translateY(-1px) !important;
+  background: rgba(20, 32, 48, 0.95) !important;
+}
+
+/* =========================================
+   SEO PAGE FOOTER LINK SPACING FIX
+   Adds clean spacing between footer links
+========================================= */
+
+.site-footer {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 14px !important;
+
+  padding: 28px 16px 36px !important;
+  text-align: center !important;
+}
+
+.site-footer a {
+  display: inline-block !important;
+  color: rgba(255, 255, 255, 0.82) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+.site-footer a:hover {
+  color: #ffffff !important;
+  text-decoration: underline !important;
+}
