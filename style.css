@@ -5733,3 +5733,34 @@ body {
   color: #ffffff !important;
   text-decoration: underline !important;
 }
+
+/* =========================================
+   SEO PAGE FOOTER GREY STYLE
+   Matches the softer FleetSignal footer feel
+========================================= */
+
+.seo-page .site-footer {
+  background: rgba(235, 240, 238, 0.92) !important;
+  border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+  margin-top: 48px !important;
+}
+
+.seo-page .site-footer a {
+  color: rgba(15, 23, 42, 0.78) !important;
+}
+
+.seo-page .site-footer a:hover {
+  color: rgba(15, 23, 42, 1) !important;
+}
+
+.seo-page .site-footer::after {
+  content: "© 2026 FleetSignal. All rights reserved.";
+  display: block !important;
+  width: 100% !important;
+  margin-top: 10px !important;
+
+  color: rgba(15, 23, 42, 0.55) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+}
