@@ -990,7 +990,7 @@ updateEmptyAlertsState(alertCount);
 if (urgentCount > 0) {
   updateDashboardSummary(
     "urgent",
-    `${urgentCount} vehicle${urgentCount === 1 ? "" : "s"} need urgent attention.`
+    `${urgentCount} vehicle${urgentCount === 1 ? "" : "s"} needs urgent attention.`
   );
 } else if (warningCount > 0) {
   updateDashboardSummary(
@@ -1067,23 +1067,13 @@ function buildAlertsPanel(vehicles) {
    const reg = vehicle.reg || "Unknown vehicle";
 
    const motDays =
-     vehicle.mot_days !== null && vehicle.mot_days !== undefined
-       ? Number(vehicle.mot_days)
-       : null;
+  vehicle.mot_days !== null && vehicle.mot_days !== undefined
+    ? Number(vehicle.mot_days)
+    : null;
 
-   const taxDays = vehicle.tax_due_date
-     ? Math.ceil(
-         (new Date(vehicle.tax_due_date) - new Date()) /
-           (1000 * 60 * 60 * 24)
-       )
-     : null;
+   const taxDays = getDaysRemaining(vehicle.tax_due_date);
 
-   const insuranceDays = vehicle.insurance_expiry
-     ? Math.ceil(
-         (new Date(vehicle.insurance_expiry) - new Date()) /
-           (1000 * 60 * 60 * 24)
-       )
-     : null;
+   const insuranceDays = getDaysRemaining(vehicle.insurance_expiry);
 
    // =========================
    // INSURANCE ALERT
@@ -1125,25 +1115,49 @@ function buildAlertsPanel(vehicles) {
      `;
    }
 
-   // =========================
-   // TAX ALERT
-   // =========================
+  // =========================
+// TAX ALERT
+// =========================
 
-   if (taxDays !== null && taxDays <= 30) {
-     hasAlerts = true;
+const taxStatusLower = (vehicle.tax_status || "").toLowerCase();
+const vehicleIsTaxed = taxStatusLower === "taxed";
 
-     const level = taxDays <= 7 ? "red" : "orange";
+// Show tax reminders when the manual tax renewal date is within 30 days.
+// But if the manual date is already in the past AND DVLA says the vehicle is taxed,
+// do not show a false overdue tax warning.
+if (
+  taxDays !== null &&
+  taxDays <= 30 &&
+  !(vehicleIsTaxed && taxDays < 0)
+) {
+  hasAlerts = true;
 
-     alertsList.innerHTML += `
-       <div class="alert-card ${level}">
-         <div class="alert-title">📄 Tax Reminder</div>
-         <div class="alert-big">${taxDays} days remaining</div>
-         <div class="alert-text">
-           ${reg} tax renewal is approaching.
-         </div>
-       </div>
-     `;
-   }
+  const level = taxDays <= 7 ? "red" : "orange";
+
+  const taxBigText =
+    taxDays < 0
+      ? `Overdue by ${Math.abs(taxDays)} days`
+      : taxDays === 0
+      ? "Due today"
+      : `${taxDays} days remaining`;
+
+  const taxMessage =
+    taxDays < 0
+      ? `${reg} tax renewal is overdue.`
+      : taxDays === 0
+      ? `${reg} tax renewal is due today.`
+      : `${reg} tax renewal is approaching.`;
+
+  alertsList.innerHTML += `
+    <div class="alert-card ${level}">
+      <div class="alert-title">📄 Tax Reminder</div>
+      <div class="alert-big">${taxBigText}</div>
+      <div class="alert-text">
+        ${taxMessage}
+      </div>
+    </div>
+  `;
+} 
  });
 
  // =========================

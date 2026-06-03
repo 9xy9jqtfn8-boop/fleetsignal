@@ -247,6 +247,8 @@ export default async function handler(req, res) {
       const reg = v.reg || "Unknown registration";
       const make = v.make || "Unknown vehicle";
       const taxStatus = v.tax_status || "Unknown";
+      const taxStatusLower = taxStatus.toLowerCase();
+      const vehicleIsTaxed = taxStatusLower === "taxed";
       const motDays = Number(v.mot_days);
 
       const taxDays = daysUntilDate(v.tax_due_date);
@@ -265,7 +267,7 @@ export default async function handler(req, res) {
         });
       }
 
-      if (isDueSoon(taxDays)) {
+      if (isDueSoon(taxDays) && !(vehicleIsTaxed && taxDays < 0)) {
         dueItems.push({
           type: "Tax",
           label: "Tax Renewal",
