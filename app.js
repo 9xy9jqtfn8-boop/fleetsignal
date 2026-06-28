@@ -742,15 +742,21 @@ updateEmptyFleetState(data.length);
     
     const taxDays = getDaysRemaining(v.tax_due_date);
     const insuranceDays = getDaysRemaining(v.insurance_expiry);
-    const urgentAlert =(v.mot_days !== null && v.mot_days <= 7) || 
-      (taxDays !== null && taxDays <= 7) ||
-      (insuranceDays !== null && insuranceDays <= 7) ||
-      (v.tax_status && v.tax_status.toLowerCase() !== "taxed");
 
-    const warningAlert =
-      (v.mot_days !== null && v.mot_days <= 30) ||
-      (taxDays !== null && taxDays <= 30) ||
-      (insuranceDays !== null && insuranceDays <= 30);
+    const taxStatus = (v.tax_status || "").toString().trim().toLowerCase();
+    const motStatus = (v.mot_status || "").toString().trim().toLowerCase();
+
+   const urgentAlert =
+  (motStatus && motStatus !== "valid") ||
+  (v.mot_days !== null && v.mot_days <= 7) ||
+  (taxDays !== null && taxDays <= 7) ||
+  (insuranceDays !== null && insuranceDays <= 7) ||
+  (taxStatus && taxStatus !== "taxed" && taxStatus !== "valid");
+
+   const warningAlert =
+  (v.mot_days !== null && v.mot_days <= 30) ||
+  (taxDays !== null && taxDays <= 30) ||
+  (insuranceDays !== null && insuranceDays <= 30);
 
     if (urgentAlert) {
       urgentCount++;
