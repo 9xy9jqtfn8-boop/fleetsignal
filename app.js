@@ -740,23 +740,30 @@ updateEmptyFleetState(data.length);
 
   for (const v of data) {
     
-    const taxDays = getDaysRemaining(v.tax_due_date);
-    const insuranceDays = getDaysRemaining(v.insurance_expiry);
+     const taxDays = getDaysRemaining(v.tax_due_date);
+const insuranceDays = getDaysRemaining(v.insurance_expiry);
 
-    const taxStatus = (v.tax_status || "").toString().trim().toLowerCase();
-    const motStatus = (v.mot_status || "").toString().trim().toLowerCase();
+const taxStatus = (v.tax_status || "").toString().trim().toLowerCase();
+const motDays = v.mot_days !== null && v.mot_days !== undefined
+ ? Number(v.mot_days)
+ : null;
 
-   const urgentAlert =
-  (motStatus && motStatus !== "valid") ||
-  (v.mot_days !== null && v.mot_days <= 7) ||
-  (taxDays !== null && taxDays <= 7) ||
+const taxIsProblem =
+  taxStatus && taxStatus !== "taxed" && taxStatus !== "valid";
+
+const taxDateShouldAlert =
+  taxDays !== null && taxStatus !== "taxed";
+
+const urgentAlert =
+  (motDays !== null && motDays <= 7) ||
+  (taxDateShouldAlert && taxDays <= 7) ||
   (insuranceDays !== null && insuranceDays <= 7) ||
-  (taxStatus && taxStatus !== "taxed" && taxStatus !== "valid");
+  taxIsProblem;
 
-   const warningAlert =
-  (v.mot_days !== null && v.mot_days <= 30) ||
-  (taxDays !== null && taxDays <= 30) ||
-  (insuranceDays !== null && insuranceDays <= 30);
+const warningAlert =
+  (motDays !== null && motDays > 7 && motDays <= 30) ||
+  (taxDateShouldAlert && taxDays > 7 && taxDays <= 30) ||
+  (insuranceDays !== null && insuranceDays > 7 && insuranceDays <= 30);
 
     if (urgentAlert) {
       urgentCount++;
@@ -790,20 +797,21 @@ if (insuranceDays != null && insuranceDays <= 30) {
   alertType = "Insurance";
 }
 
-if (taxDays != null && taxDays <= 30) {
+if (taxDateShouldAlert && taxDays <= 30) {
   alertType = "Tax";
 }
 
 if (
   v.mot_days != null &&
-  taxDays != null &&
   insuranceDays != null &&
   v.mot_days <= 30 &&
-  taxDays <= 30 &&
-  insuranceDays <= 30
+  insuranceDays <= 30 &&
+  taxDateShouldAlert &&
+  taxDays <= 30
 ) {
   alertType = "Vehicle Compliance";
-} 
+}
+
     const res = await fetch("/api/sendAlert", {
   method: "POST",
   headers: {
